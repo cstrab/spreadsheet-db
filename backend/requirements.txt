@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sqlalchemy
+pyodbc
+pymssql
+psycopg2
+pydantic
