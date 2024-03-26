@@ -9,14 +9,14 @@ logger = setup_logger('backend')
 
 # Schemas for TableOne
 class TableOneBase(BaseModel):
-    name: str
-    description: str
+    name: Optional[str]
+    description: Optional[str]
 
 class TableOneCreate(TableOneBase):
     pass
 
 class TableOneUpdate(BaseModel):
-    id: int
+    id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
 
@@ -32,15 +32,15 @@ class TableOneListUpdate(BaseModel):
 
 # Schemas for TableTwo
 class TableTwoBase(BaseModel):
-    title: str
-    details: str
-    category: str
+    title: Optional[str]
+    details: Optional[str]
+    category: Optional[str]
 
 class TableTwoCreate(TableTwoBase):
     pass
 
 class TableTwoUpdate(BaseModel):
-    id: int
+    id: Optional[int] = None
     title: Optional[str] = None
     details: Optional[str] = None
     category: Optional[str] = None

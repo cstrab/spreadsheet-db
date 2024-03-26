@@ -1,111 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { ReactGrid, Column, Row, CellChange, TextCell, HeaderCell, Id } from '@silevis/reactgrid'; 
-import axios from 'axios';
+import React from 'react';
+import { ReactGrid } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
-
-const API_HOST = process.env.REACT_APP_API_HOST || 'localhost';
-const API_PORT = process.env.REACT_APP_API_PORT || '8000';
-
-interface GenericGridProps {
-  tableName: string; 
-}
+import { updateData } from '../../api/api';
+import { handleCellsChanged, handleColumnResize, handleContextMenu } from '../config/gridConfig';
+import { useFetchData } from '../../hooks/useFetchData';
+import { usePrepareRows } from '../../hooks/usePrepareRows';
+import { GenericGridProps } from '../../interfaces/gridInterfaces';
 
 export const GenericGrid: React.FC<GenericGridProps> = ({ tableName }) => {
-  const [data, setData] = useState<any[]>([]); 
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [rows, setRows] = useState<Row[]>([]);
+  const { data, columns, setData, setColumns, isLoading, error } = useFetchData(tableName);
+  const rows = usePrepareRows(data, columns);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(`http://${API_HOST}:${API_PORT}/read`, { table_name: tableName });
-        setData(response.data);
-        if (response.data.length > 0) {
-          const item = response.data[0];
-          const cols = Object.keys(item).map(key => ({
-            columnId: key, 
-            width: 150,
-            resizable: true
-          })).filter(column => column.columnId !== 'id') 
-          .sort((a, b) => a.columnId === 'id' ? -1 : b.columnId === 'id' ? 1 : 0);
-          setColumns(cols);
-        }        
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      }
-    };
-
-    fetchData();
-  }, [tableName]); 
-
-  useEffect(() => {
-    const headerRow: Row<HeaderCell> = {
-      rowId: 'header',
-      cells: columns.map(column => ({ type: 'header', text: column.columnId.toString() })), 
-    };
-
-    const dataRows: Row<TextCell>[] = data.map((item, idx) => ({
-      rowId: `item-${idx}`,
-      cells: columns.map(column => ({ 
-        type: 'text' as const,
-        text: item[column.columnId] !== undefined && item[column.columnId] !== null ? item[column.columnId].toString() : '', 
-        columnId: column.columnId 
-      })).filter(cell => cell.columnId !== 'id'), 
-    }));       
-
-    setRows([headerRow, ...dataRows]);
-  }, [data, columns]);
-
-  const handleCellsChanged = (changes: CellChange[]) => {
-    const textCellChanges = changes.filter(change => change.newCell.type === 'text') as CellChange<TextCell>[];
-
-    setData(prevData => prevData.map((item, idx) => {
-      const change = textCellChanges.find(change => change.rowId === `item-${idx}`);
-      if (change && change.newCell.type === 'text' && typeof item === 'object' && change.columnId !== 'id') { 
-        return { ...item, [change.columnId]: change.newCell.text };
-      }
-      return item;
-    }));    
-  };
-
-  const handleColumnResize = (columnId: Id, width: number) => { 
-    setColumns(prevColumns => {
-      const columnIndex = prevColumns.findIndex(column => column.columnId === columnId);
-      const updatedColumn = { ...prevColumns[columnIndex], width };
-      return [...prevColumns.slice(0, columnIndex), updatedColumn, ...prevColumns.slice(columnIndex + 1)];
-    });
-  };
+  const cellsChangedHandler = handleCellsChanged(setData);
+  const columnResizeHandler = handleColumnResize(setColumns);
+  const contextMenuHandler = handleContextMenu(setData);
 
   const handleSubmit = async () => {
     try {
-      const payload = {
-        table_name: tableName,
-        updates: { 
-          data: data
-        }
-      };
-  
-      await axios.post(`http://${API_HOST}:${API_PORT}/update`, payload);
+      await updateData(tableName, data);
       alert('Updated successfully!');
-    } catch (error) {
-      console.error('Failed to update:', error);
+    } catch (updateError) {
+      console.error('Failed to update:', updateError);
       alert('Failed to update.');
     }
-  };  
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <>
       <h1>{tableName}</h1>
-      <ReactGrid 
-        rows={rows} 
-        columns={columns} 
-        onCellsChanged={handleCellsChanged} 
-        onColumnResized={handleColumnResize} 
+      <ReactGrid
+        rows={rows}
+        columns={columns}
+        onCellsChanged={cellsChangedHandler}
+        onColumnResized={columnResizeHandler}
         stickyTopRows={1}
-      /> 
-      <button onClick={handleSubmit}>
-        Update
-      </button>
+        onContextMenu={contextMenuHandler}
+        enableRowSelection
+      />
+      <button onClick={handleSubmit}>Update</button>
     </>
   );
 };

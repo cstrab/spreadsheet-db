@@ -63,20 +63,25 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     
     for update_instance in updates.data:
         update_dict = update_instance.dict(exclude_unset=True)
-        item_id = update_dict.pop("id")
-        db_item = db.query(model).filter(model.id == item_id).first()
-        
-        if not db_item:
-            logger.error(f"Item with id {item_id} not found")
-            raise HTTPException(status_code=404, detail=f"Item with id {item_id} not found")
-        
-        for key, value in update_dict.items():
-            if hasattr(db_item, key):
-                setattr(db_item, key, value)
-            else:
-                logger.error(f"Item with id {item_id} does not have attribute {key}")
-                raise HTTPException(status_code=404, detail=f"Item with id {item_id} does not have attribute {key}")
-        db.add(db_item)
+        item_id = update_dict.pop("id", None)
+        if item_id is None:
+            # If the item_id is None, create a new row
+            db_item = model(**update_dict)
+            db.add(db_item)
+        else:
+            # If the item_id is not None, update the existing row
+            db_item = db.query(model).filter(model.id == item_id).first()
+            if not db_item:
+                logger.error(f"Item with id {item_id} not found")
+                raise HTTPException(status_code=404, detail=f"Item with id {item_id} not found")
+            for key, value in update_dict.items():
+                if hasattr(db_item, key):
+                    setattr(db_item, key, value)
+                else:
+                    logger.error(f"Item with id {item_id} does not have attribute {key}")
+                    raise HTTPException(status_code=404, detail=f"Item with id {item_id} does not have attribute {key}")
+            db.add(db_item)
     db.commit()
     logger.info("Ending /update endpoint")
     return {"message": "Table updated successfully"}
+
