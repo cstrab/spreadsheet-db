@@ -25,32 +25,26 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-      GET_ITEMS_ENDPOINT: ${GET_ITEMS_ENDPOINT}
-      UPDATE_ITEMS_ENDPOINT: ${UPDATE_ITEMS_ENDPOINT}
     depends_on:
       - database
 
-  # frontend:
-  #     build: 
-  #       context: ./frontend
-  #       args: 
-  #         - REACT_APP_API_HOST=${REACT_APP_API_HOST}
-  #         - REACT_APP_API_PORT=${REACT_APP_API_PORT}
-  #         - REACT_APP_GET_ITEMS_ENDPOINT=${REACT_APP_GET_ITEMS_ENDPOINT}
-  #         - REACT_APP_UPDATE_ITEMS_ENDPOINT=${REACT_APP_UPDATE_ITEMS_ENDPOINT}
-  #     env_file:
-  #     - .env
-  #     ports:
-  #       - "${REACT_APP_PORT}:${REACT_APP_NGINX_PORT}"
-  #     volumes:
-  #       - ./frontend:/app
-  #     environment:
-  #       REACT_APP_API_HOST: ${REACT_APP_API_HOST}
-  #       REACT_APP_API_PORT: ${REACT_APP_API_PORT}
-  #       REACT_APP_GET_ITEMS_ENDPOINT: ${REACT_APP_GET_ITEMS_ENDPOINT}
-  #       REACT_APP_UPDATE_ITEMS_ENDPOINT: ${REACT_APP_UPDATE_ITEMS_ENDPOINT}
-  #     depends_on:
-  #       - backend
+  frontend:
+      build: 
+        context: ./frontend
+        args: 
+          - REACT_APP_API_HOST=${REACT_APP_API_HOST}
+          - REACT_APP_API_PORT=${REACT_APP_API_PORT}
+      env_file:
+      - .env
+      ports:
+        - "${REACT_APP_PORT}:${REACT_APP_NGINX_PORT}"
+      volumes:
+        - ./frontend:/app
+      environment:
+        REACT_APP_API_HOST: ${REACT_APP_API_HOST}
+        REACT_APP_API_PORT: ${REACT_APP_API_PORT}
+      depends_on:
+        - backend
 
 volumes:
   postgres-data:

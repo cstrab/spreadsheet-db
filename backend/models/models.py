@@ -13,12 +13,20 @@ POSTGRES_PORT = os.getenv('POSTGRES_PORT')
 
 Base = declarative_base()
 
-class Item(Base):
-    __tablename__ = 'items'
+class TableOne(Base):
+    __tablename__ = 'table_one'
     __table_args__ = {'schema': 'test_schema'}
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String, index=True)
+
+class TableTwo(Base):
+    __tablename__ = 'table_two'
+    __table_args__ = {'schema': 'test_schema'}
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    details = Column(String, index=True)
+    category = Column(String, index=True)
 
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 

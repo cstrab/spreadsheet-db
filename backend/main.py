@@ -1,59 +1,81 @@
-import os
-from typing import List
-
-from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 
-from models.models import Item as DBItem
-from models.schemas import ItemListUpdate, Item
+from models.schemas import Read, Update, TableOneRead, TableTwoRead
+from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
 from utils.database import get_db
 
-
-GET_ITEMS_ENDPOINT = os.getenv('GET_ITEMS_ENDPOINT')  
-UPDATE_ITEMS_ENDPOINT = os.getenv('UPDATE_ITEMS_ENDPOINT')
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-@app.get(GET_ITEMS_ENDPOINT, response_model=List[Item])
-def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    items = db.query(DBItem).offset(skip).limit(limit).all()
-    return items
+# TODO: Investigate why this is not working as intended
+# @app.post("/read")
+# def read_table(request: Read, db: Session = Depends(get_db)):
+#     table_name = request.table_name
+#     skip = request.skip
+#     limit = request.limit
+    
+#     if table_name not in TABLE_MODEL_MAPPING:
+#         raise HTTPException(status_code=404, detail="Table not found")
+    
+#     model = TABLE_MODEL_MAPPING[table_name]
+#     schema = TABLE_SCHEMA_MAPPING[table_name]["read"]
+    
+#     items = db.query(model).offset(skip).limit(limit).all()
+#     return [schema.from_orm(item) for item in items]
 
-@app.put(UPDATE_ITEMS_ENDPOINT, response_model=List[Item])
-async def update_items(item_list: ItemListUpdate, db: Session = Depends(get_db)):
-    current_ids = db.query(DBItem.id).all()
-    current_ids = set([id[0] for id in current_ids])
+@app.post("/read")
+def read_table(request: Read, db: Session = Depends(get_db)):
+    table_name = request.table_name
+    skip = request.skip
+    limit = request.limit
+    
+    if table_name not in TABLE_MODEL_MAPPING:
+        raise HTTPException(status_code=404, detail="Table not found")
+    
+    model = TABLE_MODEL_MAPPING[table_name]
+    schema = TABLE_SCHEMA_MAPPING[table_name]["read"]
+    
+    items = db.query(model).offset(skip).limit(limit).all()
+    
+    if table_name == 'table_one':
+        result = [schema(id=item.id, name=item.name, description=item.description) for item in items]
+    elif table_name == 'table_two':
+        result = [schema(id=item.id, title=item.title, details=item.details, category=item.category) for item in items]
+    else:
+        raise HTTPException(status_code=404, detail=f"Unsupported table: {table_name}")
 
-    payload_ids = set([item.id for item in item_list.data])
+    return result
 
-    delete_ids = current_ids - payload_ids
+@app.post("/update")
+async def update_table(request: Update, db: Session = Depends(get_db)):
+    table_name = request.table_name
+    updates = request.updates
+    
+    if table_name not in TABLE_MODEL_MAPPING or table_name not in TABLE_SCHEMA_MAPPING:
+        raise HTTPException(status_code=404, detail="Table not found")
+    
+    model = TABLE_MODEL_MAPPING[table_name]
+    schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
+    
+    for update_instance in updates.data:
+        update_dict = update_instance.dict(exclude_unset=True)
+        item_id = update_dict.pop("id")
+        db_item = db.query(model).filter(model.id == item_id).first()
+        if not db_item:
+            raise HTTPException(status_code=404, detail=f"Item with id {item_id} not found")
+        for key, value in update_dict.items():
+            setattr(db_item, key, value)
+        db.add(db_item)
+    db.commit()
+    return {"message": "Table updated successfully"}
 
-    if delete_ids:
-        db.query(DBItem).filter(DBItem.id.in_(delete_ids)).delete(synchronize_session='fetch')
-        db.commit()
-
-    updated_items = []
-    for item_update in item_list.data:
-        db_item = db.query(DBItem).filter(DBItem.id == item_update.id).first()
-        if db_item:
-            if item_update.name is not None:
-                db_item.name = item_update.name
-            if item_update.description is not None:
-                db_item.description = item_update.description
-        else:
-            db_item = DBItem(id=item_update.id, name=item_update.name, description=item_update.description)
-            db.add(db_item)
-        db.commit()
-        db.refresh(db_item)
-        updated_items.append(db_item)
-
-    return updated_items
