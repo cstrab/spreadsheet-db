@@ -18,12 +18,13 @@ CREATE TABLE IF NOT EXISTS test_schema.table_two (
 
 -- Insert fake data into table_one
 INSERT INTO test_schema.table_one (name, description) VALUES
-('Item One', 'Description for Item One'),
-('Item Two', 'Description for Item Two'),
-('Item Three', 'Description for Item Three');
+('banana', 'a yellow fruit'),
+('apple', 'a red fruit with seeds'),
+('kiwi', 'a small green fruit with seeds');
 
 -- Insert fake data into table_two
 INSERT INTO test_schema.table_two (title, details, category) VALUES
-('Title One', 'Details for Title One', 'Category A'),
-('Title Two', 'Details for Title Two', 'Category B'),
-('Title Three', 'Details for Title Three', 'Category C');
+('star wars', 'a film with lightsabers', 'sci-fi'),
+('harry potter', 'a film about a wizard', 'fantasy'),
+('lord of the rings', 'a film about a ring', 'fantasy'),
+('the matrix', 'a film about a computer hacker', 'sci-fi');

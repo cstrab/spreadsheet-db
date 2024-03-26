@@ -26,9 +26,10 @@ export const GenericGrid: React.FC<GenericGridProps> = ({ tableName }) => {
             columnId: key, 
             width: 150,
             resizable: true
-          })).sort((a, b) => a.columnId === 'id' ? -1 : b.columnId === 'id' ? 1 : 0);
+          })).filter(column => column.columnId !== 'id') 
+          .sort((a, b) => a.columnId === 'id' ? -1 : b.columnId === 'id' ? 1 : 0);
           setColumns(cols);
-        }
+        }        
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -46,11 +47,11 @@ export const GenericGrid: React.FC<GenericGridProps> = ({ tableName }) => {
     const dataRows: Row<TextCell>[] = data.map((item, idx) => ({
       rowId: `item-${idx}`,
       cells: columns.map(column => ({ 
-        type: 'text', 
+        type: 'text' as const,
         text: item[column.columnId] !== undefined && item[column.columnId] !== null ? item[column.columnId].toString() : '', 
         columnId: column.columnId 
-      })),
-    }));
+      })).filter(cell => cell.columnId !== 'id'), 
+    }));       
 
     setRows([headerRow, ...dataRows]);
   }, [data, columns]);
@@ -60,11 +61,11 @@ export const GenericGrid: React.FC<GenericGridProps> = ({ tableName }) => {
 
     setData(prevData => prevData.map((item, idx) => {
       const change = textCellChanges.find(change => change.rowId === `item-${idx}`);
-      if (change && change.newCell.type === 'text' && typeof item === 'object') { 
+      if (change && change.newCell.type === 'text' && typeof item === 'object' && change.columnId !== 'id') { 
         return { ...item, [change.columnId]: change.newCell.text };
       }
       return item;
-    }));
+    }));    
   };
 
   const handleColumnResize = (columnId: Id, width: number) => { 

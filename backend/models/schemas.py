@@ -2,6 +2,10 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, validator
 
+from utils.logger import setup_logger
+
+
+logger = setup_logger('backend')
 
 # Schemas for TableOne
 class TableOneBase(BaseModel):
@@ -66,8 +70,12 @@ class Update(BaseModel):
     def set_updates(cls, v, values):
         table_name = values.get('table_name')
         if table_name == 'table_one':
+            logger.info("Using TableOneListUpdate schema for updates")
             return TableOneListUpdate(**v)
         elif table_name == 'table_two':
+            logger.info("Using TableTwoListUpdate schema for updates")
             return TableTwoListUpdate(**v)
         else:
+            logger.error(f"Invalid table_name: {table_name}")
             raise ValueError('Invalid table_name')
+        
