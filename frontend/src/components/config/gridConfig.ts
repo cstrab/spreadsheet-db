@@ -1,4 +1,4 @@
-import { CellChange, Id, MenuOption, SelectionMode, TextCell, Column } from '@silevis/reactgrid';
+import { CellChange, Id, MenuOption, SelectionMode, TextCell } from '@silevis/reactgrid';
 import { DataItem, CustomColumn } from '../../interfaces/gridInterfaces';
 
 export const handleCellsChanged = (setData: React.Dispatch<React.SetStateAction<DataItem[]>>) => (changes: CellChange[]) => {
