@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 # Schemas for TableOne
@@ -61,3 +61,13 @@ class Read(BaseModel):
 class Update(BaseModel):
     table_name: str
     updates: Union[TableOneListUpdate, TableTwoListUpdate]
+
+    @validator('updates', pre=True)
+    def set_updates(cls, v, values):
+        table_name = values.get('table_name')
+        if table_name == 'table_one':
+            return TableOneListUpdate(**v)
+        elif table_name == 'table_two':
+            return TableTwoListUpdate(**v)
+        else:
+            raise ValueError('Invalid table_name')
