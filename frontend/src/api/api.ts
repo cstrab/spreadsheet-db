@@ -8,10 +8,11 @@ export const fetchData = async (tableName: string) => {
   return response.data;
 };
 
-export const updateData = async (tableName: string, data: any[]) => {
+export const updateData = async (tableName: string, data: any[], removedRowIds: string[]) => {
   const payload = {
     table_name: tableName,
-    updates: { data }
+    updates: { data },
+    removed_row_ids: removedRowIds
   };
   await axios.post(`http://${API_HOST}:${API_PORT}/update`, payload);
 };

@@ -9,15 +9,16 @@ import { GenericGridProps } from '../../interfaces/gridInterfaces';
 
 export const GenericGrid: React.FC<GenericGridProps> = ({ tableName }) => {
   const { data, columns, setData, setColumns, isLoading, error } = useFetchData(tableName);
+  const [removedRowIds, setRemovedRowIds] = React.useState<string[]>([]); 
   const rows = usePrepareRows(data, columns);
 
   const cellsChangedHandler = handleCellsChanged(setData);
   const columnResizeHandler = handleColumnResize(setColumns);
-  const contextMenuHandler = handleContextMenu(setData);
+  const contextMenuHandler = handleContextMenu(setData, setRemovedRowIds); 
 
   const handleSubmit = async () => {
     try {
-      await updateData(tableName, data);
+      await updateData(tableName, data, removedRowIds); 
       alert('Updated successfully!');
     } catch (updateError) {
       console.error('Failed to update:', updateError);

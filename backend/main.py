@@ -54,6 +54,7 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     logger.info("Starting /update endpoint")
     table_name = request.table_name
     updates = request.updates
+    removed_row_ids = request.removed_row_ids
     
     if table_name not in TABLE_MODEL_MAPPING or table_name not in TABLE_SCHEMA_MAPPING:
         logger.error(f"Table not found: {table_name}")
@@ -61,6 +62,18 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     
     model = TABLE_MODEL_MAPPING[table_name]
     
+    # Handle removed rows
+    for row_id in removed_row_ids:
+        # Extract the number from the row_id # TODO: Update this on the Frontend so we do not have to split
+        row_id_number = int(row_id.split('-')[1])
+        db_item = db.query(model).filter(model.id == row_id_number).first()
+        if db_item:
+            db.delete(db_item)
+        else:
+            logger.error(f"Item with id {row_id_number} not found")
+            raise HTTPException(status_code=404, detail=f"Item with id {row_id_number} not found")
+    
+    # Handle updated and new rows
     for update_instance in updates.data:
         update_dict = update_instance.dict(exclude_unset=True)
         item_id = update_dict.pop("id", None)
@@ -79,9 +92,9 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
                     setattr(db_item, key, value)
                 else:
                     logger.error(f"Item with id {item_id} does not have attribute {key}")
-                    raise HTTPException(status_code=404, detail=f"Item with id {item_id} does not have attribute {key}")
-            db.add(db_item)
+                    raise HTTPException(status_code=400, detail=f"Item with id {item_id} does not have attribute {key}")
+    
     db.commit()
     logger.info("Ending /update endpoint")
-    return {"message": "Table updated successfully"}
+    return {"message": "Update successful"}
 

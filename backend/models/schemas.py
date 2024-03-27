@@ -65,6 +65,7 @@ class Read(BaseModel):
 class Update(BaseModel):
     table_name: str
     updates: Union[TableOneListUpdate, TableTwoListUpdate]
+    removed_row_ids: List[str]
 
     @validator('updates', pre=True)
     def set_updates(cls, v, values):

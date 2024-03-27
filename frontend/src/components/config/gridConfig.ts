@@ -21,7 +21,7 @@ export const handleColumnResize = (setColumns: React.Dispatch<React.SetStateActi
   });
 };
 
-export const handleContextMenu = (setData: React.Dispatch<React.SetStateAction<DataItem[]>>) => (
+export const handleContextMenu = (setData: React.Dispatch<React.SetStateAction<DataItem[]>>, setRemovedRowIds: React.Dispatch<React.SetStateAction<string[]>>) => (
   selectedRowIds: Id[],
   selectedColIds: Id[],
   selectionMode: SelectionMode,
@@ -45,7 +45,9 @@ export const handleContextMenu = (setData: React.Dispatch<React.SetStateAction<D
           label: "Remove row",
           handler: () => {
             setData((prevData: DataItem[]) => {
-              return prevData.filter((_: any, idx: number) => !selectedRowIds.includes(`item-${idx}`));
+              const updatedData = prevData.filter((_: any, idx: number) => !selectedRowIds.includes(`item-${idx}`));
+              setRemovedRowIds((prevRemovedRowIds: string[]) => [...prevRemovedRowIds, ...selectedRowIds.map(String)]);
+              return updatedData;
             });
           }
         }
