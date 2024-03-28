@@ -1,5 +1,5 @@
 import React from 'react';
-import { GenericGrid } from '../components/common/GenericGrid';
+import GenericGrid from '../components/common/GenericGrid';
 
 interface TablePageProps {
   tableName: string;
@@ -7,8 +7,6 @@ interface TablePageProps {
 
 export const TablePage: React.FC<TablePageProps> = ({ tableName }) => {
   return (
-    <GenericGrid
-      tableName={tableName} 
-    />
+    <GenericGrid tableName={tableName} />
   );
 };

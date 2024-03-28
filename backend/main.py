@@ -63,9 +63,9 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     model = TABLE_MODEL_MAPPING[table_name]
     
     # Handle removed rows
-    for row_id in removed_row_ids:
-        # Extract the number from the row_id # TODO: Update this on the Frontend so we do not have to split
-        row_id_number = int(row_id.split('-')[1])
+    for row_id_str in removed_row_ids:
+        # Directly convert row_id to integer, assuming it's correctly formatted
+        row_id_number = int(row_id_str)
         db_item = db.query(model).filter(model.id == row_id_number).first()
         if db_item:
             db.delete(db_item)
@@ -78,11 +78,11 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
         update_dict = update_instance.dict(exclude_unset=True)
         item_id = update_dict.pop("id", None)
         if item_id is None:
-            # If the item_id is None, create a new row
+            # Create a new row if item_id is None
             db_item = model(**update_dict)
             db.add(db_item)
         else:
-            # If the item_id is not None, update the existing row
+            # Update the existing row if item_id is not None
             db_item = db.query(model).filter(model.id == item_id).first()
             if not db_item:
                 logger.error(f"Item with id {item_id} not found")
@@ -91,10 +91,9 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
                 if hasattr(db_item, key):
                     setattr(db_item, key, value)
                 else:
-                    logger.error(f"Item with id {item_id} does not have attribute {key}")
-                    raise HTTPException(status_code=400, detail=f"Item with id {item_id} does not have attribute {key}")
+                    logger.error(f"Attribute '{key}' not found on item with id {item_id}")
+                    raise HTTPException(status_code=400, detail=f"Attribute '{key}' not found on item with id {item_id}")
     
     db.commit()
     logger.info("Ending /update endpoint")
     return {"message": "Update successful"}
-

@@ -2,13 +2,13 @@
 
 Stack:
 - Frontend: React.js
-    - Noteable packages: ReactGrid
+    - Noteable packages: AG Grid
 - Backend: Python
     - Noteable packages: FastAPI, SQLAlchemy
-- Database: PostresSQL (To be changed later to MSSQL)
+- Database: PostresSQL or MSSQL
 
 CI/CD:
-- Gitlab CI
+- Github Actions or Gitlab CI
 - ArgoCD
 
 Deployment:
@@ -35,3 +35,11 @@ Stage: MVP - The app will be considered Alpha after this phase. Breaking changes
     - [x] Setup docker-compose for local testing
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
+
+
+Issues/Bugs:
+
+- [ ] Frontend:
+    - [ ] When all rows are deleted, add row functionality does not work
+- [x] Backend:
+- [x] Database:
