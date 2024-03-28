@@ -31,7 +31,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
           defs.push({
             headerName: "Remove",
             field: "remove",
-            cellRenderer: RemoveButtonRenderer, // Use 'cellRenderer' directly for React components
+            cellRenderer: RemoveButtonRenderer, 
             editable: false,
             filter: false,
             sortable: false,
@@ -52,12 +52,9 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     try {
       await updateData(tableName, updatedData, removedRowIds);
       alert('Updated successfully!');
-      // Reset the removedRowIds state after successful update
       setRemovedRowIds([]);
-      // Fetch the updated data to refresh the grid
       const refreshedData = await fetchData(tableName);
       setRowData(refreshedData);
-      // Optionally reset changes if you want to clear the changes tracking after successful update
       setChanges({});
     } catch (error) {
       console.error('Failed to update:', error);
@@ -66,21 +63,31 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   };
 
   const handleAddRow = () => {
+    // Generate a temporary unique ID for the new row
+    const tempId = `temp-${Date.now()}`; // Example: temp-1609459200000
     const newRow = columnDefs.reduce((acc, colDef) => {
-      if (colDef.field !== 'id') {
-        acc[colDef.field as string] = '';
-      }
-      return acc;
-    }, {} as any);
-
-    setRowData(prev => [newRow, ...prev]);
+        if (colDef.field && colDef.field !== 'id') {
+            acc[colDef.field] = ''; // Use colDef.field as a key
+        } else if (colDef.field === 'id') {
+            acc[colDef.field] = tempId; // Assign the temporary ID for 'id' field
+        }
+        return acc;
+    }, {} as Record<string, any>); // Explicitly declare the accumulator as an object with string keys and any type values
+  
+    setRowData(prev => [...prev, newRow]);
   };
-
+  
   const handleRemoveRow = (params: ICellRendererParams) => {
     const idToRemove = params.data.id;
+    // Filter out the row immediately for visual feedback
     setRowData(rowData.filter(row => row.id !== idToRemove));
-    setRemovedRowIds(prev => [...prev, idToRemove.toString()]); // Assuming 'id' is suitable to be converted to string
-  };  
+
+    // Only add the id to removedRowIds if it is defined
+    if (idToRemove !== undefined) {
+        setRemovedRowIds(prev => [...prev, idToRemove.toString()]);
+    }
+};
+
 
   return (
     <div className="ag-theme-quartz" style={{ height: 500 }}>
@@ -89,7 +96,6 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         columnDefs={columnDefs}
         onCellValueChanged={onCellValueChanged}
         context={{ handleRemoveRow }}
-        // No longer using 'frameworkComponents' as we've directly specified the React component
       />
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow}>Add Row</button>
