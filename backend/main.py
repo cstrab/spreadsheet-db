@@ -37,6 +37,9 @@ def read_table(request: Read, db: Session = Depends(get_db)):
     items = db.query(model).offset(skip).limit(limit).all()
     logger.info(f"Retrieved {len(items)} items from the database")
     
+    # Get the column names
+    columns = model.__table__.columns.keys()
+
     # TODO: Investigate why return [schema.from_orm(item) for item in items] is not working as intended
     if table_name == 'table_one':
         result = [schema(id=item.id, name=item.name, description=item.description) for item in items]
@@ -47,7 +50,7 @@ def read_table(request: Read, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=f"Unsupported table: {table_name}")
 
     logger.info("Ending /read endpoint")
-    return result
+    return {"columns": list(columns), "data": result}
 
 @app.post("/update")
 async def update_table(request: Update, db: Session = Depends(get_db)):

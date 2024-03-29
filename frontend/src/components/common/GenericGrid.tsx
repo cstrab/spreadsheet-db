@@ -15,20 +15,21 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
 
-
   useEffect(() => {
     fetchData(tableName)
-      .then(data => {
+      .then(response => {
+        const { columns, data } = response;
         setRowData(data);
-
+  
         if (data.length > 0) {
-          const defs: ColDef[] = Object.keys(data[0]).map(key => ({
-            headerName: key.charAt(0).toUpperCase() + key.slice(1),
-            field: key,
+          const defs: ColDef[] = columns.map((column: string) => ({
+            headerName: column.charAt(0).toUpperCase() + column.slice(1),
+            field: column,
             editable: true,
-            filter: true,  // Enable filtering for this column
+            filter: true,  
+            hide: column === 'id',
           }));
-        
+  
           defs.push({
             headerName: "Remove",
             field: "remove",
@@ -37,31 +38,32 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
             filter: false,
             sortable: false,
           });
-        
+  
           setColumnDefs(defs);
         }        
       })
       .catch(error => console.error('Error:', error));
-  }, [tableName]);
+  }, [tableName]);  
 
   const onCellValueChanged = ({ data }: { data: any }) => {
     setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
   };
 
-  const handleUpdate = async () => {
-    const updatedData = Object.values(changes);
-    try {
-      await updateData(tableName, updatedData, removedRowIds);
-      alert('Updated successfully!');
-      setRemovedRowIds([]);
-      const refreshedData = await fetchData(tableName);
-      setRowData(refreshedData);
-      setChanges({});
-    } catch (error) {
-      console.error('Failed to update:', error);
-      alert('Failed to update. Please try again.');
-    }
-  };
+const handleUpdate = async () => {
+  const updatedData = Object.values(changes);
+  try {
+    await updateData(tableName, updatedData, removedRowIds);
+    alert('Updated successfully!');
+    setRemovedRowIds([]);
+    const refreshedResponse = await fetchData(tableName);
+    const { data } = refreshedResponse;
+    setRowData(data);
+    setChanges({});
+  } catch (error) {
+    console.error('Failed to update:', error);
+    alert('Failed to update. Please try again.');
+  }
+};
 
   const tempId = useRef(-1);  // Use useRef instead of let
 

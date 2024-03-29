@@ -5,8 +5,12 @@ const API_PORT = process.env.REACT_APP_API_PORT || '8000';
 
 export const fetchData = async (tableName: string) => {
   const response = await axios.post(`http://${API_HOST}:${API_PORT}/read`, { table_name: tableName });
-  return response.data;
+  return {
+    data: response.data.data,
+    columns: response.data.columns
+  };
 };
+
 
 export const updateData = async (tableName: string, data: any[], removedRowIds: string[]) => {
   const payload = {
