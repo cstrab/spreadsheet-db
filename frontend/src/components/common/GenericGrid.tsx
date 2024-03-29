@@ -57,18 +57,29 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     if (file) {
       Papa.parse(file, {
         header: true,
-        complete: function(results) {
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: function(results: { data: Record<string, any>[] }) {
           const { data } = results;
-  
+    
           // Prepare payload
-          const updates = data.map((row: any, index) => {
-            const { remove, ...rest } = row;  // Exclude 'remove' property
-            return {
-              id: -index - 1,  // Assign negative IDs
-              ...rest
-            };
+          const updates = data.map((row: Record<string, any>, index) => {
+            const entry: Record<string, any> = { id: -index - 1 };  // Assign negative IDs
+            for (const field in row) {
+              if (field !== 'remove') {
+                const values = row[field].split(',');
+                const fields = columnDefs.map(colDef => colDef.field).filter(field => field !== 'remove' && field !== 'id') as string[];  // Get the actual dynamic fields
+                const fieldIndices: Record<string, number> = fields.reduce((acc, field, i) => ({ ...acc, [field]: i }), {});  // Create a mapping from field names to indices
+                fields.forEach((field: string) => {
+                  if (fieldIndices[field] !== undefined) {
+                    entry[field] = values[fieldIndices[field]];
+                  }
+                });
+              }
+            }
+            return entry;
           });
-  
+    
           // Add new rows to rowData and changes
           setRowData(prev => [...prev, ...updates]);
           setChanges(prev => ({ ...prev, ...Object.fromEntries(updates.map(row => [row.id, row])) }));
@@ -76,7 +87,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
       });
     }
   };
-
+  
   const handleUpdate = async () => {
     const updatedData = Object.values(changes);
     try {
