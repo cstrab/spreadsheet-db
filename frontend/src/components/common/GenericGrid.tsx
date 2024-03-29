@@ -4,6 +4,7 @@ import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { fetchData, updateData } from '../../api/api';
+import Papa from 'papaparse';
 
 const RemoveButtonRenderer = (props: ICellRendererParams) => {
   return <button onClick={() => props.context.handleRemoveRow(props)}>Remove</button>;
@@ -14,6 +15,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchData(tableName)
@@ -49,21 +51,49 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
   };
 
-const handleUpdate = async () => {
-  const updatedData = Object.values(changes);
-  try {
-    await updateData(tableName, updatedData, removedRowIds);
-    alert('Updated successfully!');
-    setRemovedRowIds([]);
-    const refreshedResponse = await fetchData(tableName);
-    const { data } = refreshedResponse;
-    setRowData(data);
-    setChanges({});
-  } catch (error) {
-    console.error('Failed to update:', error);
-    alert('Failed to update. Please try again.');
-  }
-};
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(e.target.files ? e.target.files[0] : null);
+  };
+
+  const handleUpload = () => {
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: function(results) {
+          const { data } = results;
+  
+          // Prepare payload
+          const updates = data.map((row: any, index) => {
+            const { remove, ...rest } = row;  // Exclude 'remove' property
+            return {
+              id: -index - 1,  // Assign negative IDs
+              ...rest
+            };
+          });
+  
+          // Add new rows to rowData and changes
+          setRowData(prev => [...prev, ...updates]);
+          setChanges(prev => ({ ...prev, ...Object.fromEntries(updates.map(row => [row.id, row])) }));
+        }
+      });
+    }
+  };
+
+  const handleUpdate = async () => {
+    const updatedData = Object.values(changes);
+    try {
+      await updateData(tableName, updatedData, removedRowIds);
+      alert('Updated successfully!');
+      setRemovedRowIds([]);
+      const refreshedResponse = await fetchData(tableName);
+      const { data } = refreshedResponse;
+      setRowData(data);
+      setChanges({});
+    } catch (error) {
+      console.error('Failed to update:', error);
+      alert('Failed to update. Please try again.');
+    }
+  };
 
   const tempId = useRef(-1);  // Use useRef instead of let
 
@@ -122,6 +152,8 @@ const handleUpdate = async () => {
         context={{ handleRemoveRow }}
         onGridReady={onGridReady}  // Add this line
       />
+      <input type="file" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Upload CSV</button>
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow}>Add Row</button>
     </div>
