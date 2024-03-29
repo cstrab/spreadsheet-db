@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { fetchData, updateData } from '../../api/api';
@@ -65,18 +65,32 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
 
   const tempId = useRef(-1);  // Use useRef instead of let
 
+  const gridApiRef = useRef<GridApi | null>(null);
+
+  const onGridReady = (params: any) => {
+    gridApiRef.current = params.api;
+  };
+
   const handleAddRow = () => {
+    // Get the current filter model
+    const filterModel = gridApiRef.current?.getFilterModel();
+  
     const newRow = columnDefs.reduce((acc, colDef) => {
       if (colDef.field && colDef.field !== 'id') {
-        acc[colDef.field] = ''; // Use colDef.field as a key
+        // If a filter is applied to this column, use the filter value
+        if (filterModel && filterModel[colDef.field]) {
+          acc[colDef.field] = filterModel[colDef.field].filter;
+        } else {
+          acc[colDef.field] = '';
+        }
       } else if (colDef.field === 'id') {
-        acc[colDef.field] = tempId.current--; // Use tempId.current
+        acc[colDef.field] = tempId.current--;
       }
       return acc;
-    }, {} as Record<string, any>); // Explicitly declare the accumulator as an object with string keys and any type values
-
+    }, {} as Record<string, any>);
+  
     setRowData(prev => [...prev, newRow]);
-  };
+  };  
   
   const handleRemoveRow = (params: ICellRendererParams) => {
     const idToRemove = params.data.id;
@@ -104,6 +118,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         columnDefs={columnDefs}
         onCellValueChanged={onCellValueChanged}
         context={{ handleRemoveRow }}
+        onGridReady={onGridReady}  // Add this line
       />
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow}>Add Row</button>
