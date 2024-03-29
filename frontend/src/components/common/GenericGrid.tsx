@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import "ag-grid-community/styles/ag-grid.css";
@@ -62,18 +62,18 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     }
   };
 
+  const tempId = useRef(-1);  // Use useRef instead of let
+
   const handleAddRow = () => {
-    // Generate a temporary unique ID for the new row
-    const tempId = `temp-${Date.now()}`; // Example: temp-1609459200000
     const newRow = columnDefs.reduce((acc, colDef) => {
-        if (colDef.field && colDef.field !== 'id') {
-            acc[colDef.field] = ''; // Use colDef.field as a key
-        } else if (colDef.field === 'id') {
-            acc[colDef.field] = tempId; // Assign the temporary ID for 'id' field
-        }
-        return acc;
+      if (colDef.field && colDef.field !== 'id') {
+        acc[colDef.field] = ''; // Use colDef.field as a key
+      } else if (colDef.field === 'id') {
+        acc[colDef.field] = tempId.current--; // Use tempId.current
+      }
+      return acc;
     }, {} as Record<string, any>); // Explicitly declare the accumulator as an object with string keys and any type values
-  
+
     setRowData(prev => [...prev, newRow]);
   };
   
@@ -84,7 +84,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
 
     // Only add the id to removedRowIds if it is defined
     if (idToRemove !== undefined) {
-        setRemovedRowIds(prev => [...prev, idToRemove.toString()]);
+        setRemovedRowIds(prev => [...prev, idToRemove]);  // Change this line
     }
 };
 

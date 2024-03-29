@@ -61,39 +61,43 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Table not found")
     
     model = TABLE_MODEL_MAPPING[table_name]
-    
+    schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
+
     # Handle removed rows
-    for row_id_str in removed_row_ids:
-        # Directly convert row_id to integer, assuming it's correctly formatted
-        row_id_number = int(row_id_str)
-        db_item = db.query(model).filter(model.id == row_id_number).first()
+    for row_id in removed_row_ids:
+        db_item = db.query(model).filter(model.id == row_id).first()
         if db_item:
             db.delete(db_item)
         else:
-            logger.error(f"Item with id {row_id_number} not found")
-            raise HTTPException(status_code=404, detail=f"Item with id {row_id_number} not found")
+            logger.error(f"Item with id {row_id} not found")
+            raise HTTPException(status_code=404, detail=f"Item with id {row_id} not found")
     
     # Handle updated and new rows
     for update_instance in updates.data:
         update_dict = update_instance.dict(exclude_unset=True)
         item_id = update_dict.pop("id", None)
-        if item_id is None:
-            # Create a new row if item_id is None
-            db_item = model(**update_dict)
-            db.add(db_item)
-        else:
-            # Update the existing row if item_id is not None
+        
+        # Validate the update data
+        try:
+            schema(**update_dict)
+        except ValueError as e:
+            logger.error(f"Invalid update data: {update_dict}, error: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Invalid update data: {update_dict}, error: {str(e)}")
+        
+        if item_id is not None and item_id >= 0:
+            # Update the existing row if item_id is not None and not negative
             db_item = db.query(model).filter(model.id == item_id).first()
             if not db_item:
                 logger.error(f"Item with id {item_id} not found")
                 raise HTTPException(status_code=404, detail=f"Item with id {item_id} not found")
             for key, value in update_dict.items():
-                if hasattr(db_item, key):
-                    setattr(db_item, key, value)
-                else:
-                    logger.error(f"Attribute '{key}' not found on item with id {item_id}")
-                    raise HTTPException(status_code=400, detail=f"Attribute '{key}' not found on item with id {item_id}")
+                setattr(db_item, key, value)
+        else:
+            # Create a new row if item_id is None or negative
+            db_item = model(**update_dict)
+            db.add(db_item)
     
     db.commit()
     logger.info("Ending /update endpoint")
     return {"message": "Update successful"}
+
