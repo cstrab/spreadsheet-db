@@ -23,30 +23,28 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         const { columns, data } = response;
         setRowData(data);
   
-        if (data.length > 0) {
-          const defs: ColDef[] = columns.map((column: string) => ({
-            headerName: column.charAt(0).toUpperCase() + column.slice(1),
-            field: column,
-            editable: true,
-            filter: true,  
-            hide: column === 'id',
-          }));
+        const defs: ColDef[] = columns.map((column: string) => ({
+          headerName: column.charAt(0).toUpperCase() + column.slice(1),
+          field: column,
+          editable: true,
+          filter: true,  
+          hide: column === 'id',
+        }));
   
-          defs.push({
-            headerName: "Remove",
-            field: "remove",
-            cellRenderer: RemoveButtonRenderer, 
-            editable: false,
-            filter: false,
-            sortable: false,
-          });
+        defs.push({
+          headerName: "Remove",
+          field: "remove",
+          cellRenderer: RemoveButtonRenderer, 
+          editable: false,
+          filter: false,
+          sortable: false,
+        });
   
-          setColumnDefs(defs);
-        }        
+        setColumnDefs(defs);
       })
       .catch(error => console.error('Error:', error));
   }, [tableName]);  
-
+  
   const onCellValueChanged = ({ data }: { data: any }) => {
     setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
   };
