@@ -80,13 +80,20 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const handleRemoveRow = (params: ICellRendererParams) => {
     const idToRemove = params.data.id;
     // Filter out the row immediately for visual feedback
-    setRowData(rowData.filter(row => row.id !== idToRemove));
-
-    // Only add the id to removedRowIds if it is defined
-    if (idToRemove !== undefined) {
-        setRemovedRowIds(prev => [...prev, idToRemove]);  // Change this line
+    setRowData(prev => prev.filter(row => row.id !== idToRemove));
+  
+    // Only add the id to removedRowIds if it is defined and not negative
+    if (idToRemove !== undefined && idToRemove >= 0) {
+      setRemovedRowIds(prev => [...prev, idToRemove]);
     }
-};
+  
+    // Remove the row from changes if it's there
+    setChanges(prev => {
+      const newChanges: Record<string | number, any> = { ...prev };
+      delete newChanges[idToRemove];
+      return newChanges;
+    });
+  };
 
 
   return (
