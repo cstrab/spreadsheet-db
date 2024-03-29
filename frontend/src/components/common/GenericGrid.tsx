@@ -26,8 +26,9 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
             headerName: key.charAt(0).toUpperCase() + key.slice(1),
             field: key,
             editable: true,
+            filter: true,  // Enable filtering for this column
           }));
-
+        
           defs.push({
             headerName: "Remove",
             field: "remove",
@@ -36,9 +37,9 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
             filter: false,
             sortable: false,
           });
-
+        
           setColumnDefs(defs);
-        }
+        }        
       })
       .catch(error => console.error('Error:', error));
   }, [tableName]);
