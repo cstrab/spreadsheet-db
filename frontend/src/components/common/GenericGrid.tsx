@@ -4,7 +4,7 @@ import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { fetchData, updateData } from '../../api/api';
-import Papa from 'papaparse';
+// import Papa from 'papaparse';
 
 const RemoveButtonRenderer = (props: ICellRendererParams) => {
   return <button onClick={() => props.context.handleRemoveRow(props)}>Remove</button>;
@@ -15,7 +15,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
-  const [file, setFile] = useState<File | null>(null);
+  // const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchData(tableName)
@@ -49,44 +49,46 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files ? e.target.files[0] : null);
-  };
+  // TODO: WIP
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setFile(e.target.files ? e.target.files[0] : null);
+  // };
 
-  const handleUpload = () => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: function(results: { data: Record<string, any>[] }) {
-          const { data } = results;
+  // TODO: WIP
+  // const handleUpload = () => {
+  //   if (file) {
+  //     Papa.parse(file, {
+  //       header: true,
+  //       dynamicTyping: true,
+  //       skipEmptyLines: true,
+  //       complete: function(results: { data: Record<string, any>[] }) {
+  //         const { data } = results;
     
-          // Prepare payload
-          const updates = data.map((row: Record<string, any>, index) => {
-            const entry: Record<string, any> = { id: -index - 1 };  // Assign negative IDs
-            for (const field in row) {
-              if (field !== 'remove') {
-                const values = row[field].split(',');
-                const fields = columnDefs.map(colDef => colDef.field).filter(field => field !== 'remove' && field !== 'id') as string[];  // Get the actual dynamic fields
-                const fieldIndices: Record<string, number> = fields.reduce((acc, field, i) => ({ ...acc, [field]: i }), {});  // Create a mapping from field names to indices
-                fields.forEach((field: string) => {
-                  if (fieldIndices[field] !== undefined) {
-                    entry[field] = values[fieldIndices[field]];
-                  }
-                });
-              }
-            }
-            return entry;
-          });
+  //         // Prepare payload
+  //         const updates = data.map((row: Record<string, any>, index) => {
+  //           const entry: Record<string, any> = { id: -index - 1 };  // Assign negative IDs
+  //           for (const field in row) {
+  //             if (field !== 'remove') {
+  //               const values = row[field].split(',');
+  //               const fields = columnDefs.map(colDef => colDef.field).filter(field => field !== 'remove' && field !== 'id') as string[];  // Get the actual dynamic fields
+  //               const fieldIndices: Record<string, number> = fields.reduce((acc, field, i) => ({ ...acc, [field]: i }), {});  // Create a mapping from field names to indices
+  //               fields.forEach((field: string) => {
+  //                 if (fieldIndices[field] !== undefined) {
+  //                   entry[field] = values[fieldIndices[field]];
+  //                 }
+  //               });
+  //             }
+  //           }
+  //           return entry;
+  //         });
     
-          // Add new rows to rowData and changes
-          setRowData(prev => [...prev, ...updates]);
-          setChanges(prev => ({ ...prev, ...Object.fromEntries(updates.map(row => [row.id, row])) }));
-        }
-      });
-    }
-  };
+  //         // Add new rows to rowData and changes
+  //         setRowData(prev => [...prev, ...updates]);
+  //         setChanges(prev => ({ ...prev, ...Object.fromEntries(updates.map(row => [row.id, row])) }));
+  //       }
+  //     });
+  //   }
+  // };
   
   const handleUpdate = async () => {
     const updatedData = Object.values(changes);
@@ -161,8 +163,8 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         context={{ handleRemoveRow }}
         onGridReady={onGridReady}  // Add this line
       />
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload CSV</button>
+      {/* <input type="file" onChange={handleFileChange} /> */}
+      {/* <button onClick={handleUpload}>Upload CSV</button> */}
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow}>Add Row</button>
     </div>

@@ -1,0 +1,10 @@
+{
+    "postgresql": {
+        "int": "SERIAL PRIMARY KEY",
+        "str": "VARCHAR(255)"
+    },
+    "mssql": {
+        "int": "INT IDENTITY(1,1) PRIMARY KEY",
+        "str": "NVARCHAR(255)"
+    }
+}

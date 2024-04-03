@@ -1,0 +1,43 @@
+{
+    "schema_name": "test_schema",
+    "tables": [
+        {
+            "table_name": "table_one",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "name",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "description",
+                    "data_type": "str"
+                }
+            ]
+        },
+        {
+            "table_name": "table_two",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "title",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "details",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "category",
+                    "data_type": "str"
+                }
+            ]
+        }
+    ]
+}
