@@ -12,6 +12,10 @@ DB_OUTPUT = ../database/autogen_init.sql
 # Backend setup variables
 BE_MAPPINGS_SCRIPT = ./backend/create_mappings.py.sh
 BE_MAPPINGS_OUTPUT = ../backend/models/autogen_mappings.py
+BE_MODELS_SCRIPT = ./backend/create_models.py.sh
+BE_DATA_TYPE_MAPPING = ./backend/data_type_mapping.json
+BE_DATABASE_MAPPING = ./backend/database_mapping.json
+BE_MODELS_OUTPUT = ../backend/models/autogen_models.py
 
 .PHONY: all database backend clean
 
@@ -28,3 +32,5 @@ database:
 backend:
 	@chmod +x $(BE_MAPPINGS_SCRIPT)
 	@./$(BE_MAPPINGS_SCRIPT) $(SCHEMA) $(BE_MAPPINGS_OUTPUT)
+	@chmod +x $(BE_MODELS_SCRIPT)
+	@./$(BE_MODELS_SCRIPT) $(SCHEMA) $(BE_DATA_TYPE_MAPPING) $(BE_MODELS_OUTPUT) $(DB_TYPE) $(BE_DATABASE_MAPPING)

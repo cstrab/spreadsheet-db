@@ -1,0 +1,4 @@
+{
+    "postgresql": "POSTGRES",
+    "mssql": "MSSQL"
+}

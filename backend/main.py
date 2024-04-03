@@ -22,73 +22,70 @@ app.add_middleware(
 
 @app.post("/read")
 def read_table(request: Read, db: Session = Depends(get_db)):
-    logger.info("Starting /read endpoint")
     table_name = request.table_name
     skip = request.skip
     limit = request.limit
+    logger.info("Executing /read endpoint for table: " + table_name)
     
-    if table_name not in TABLE_MODEL_MAPPING:
-        logger.error(f"Table not found: {table_name}")
+    logger.info(f"Checking if table {table_name} is in mappings and defining model and schema")
+    if table_name in TABLE_MODEL_MAPPING and table_name in TABLE_SCHEMA_MAPPING:
+        model = TABLE_MODEL_MAPPING[table_name]
+        schema = TABLE_SCHEMA_MAPPING[table_name]["read"]
+    else:
+        logger.error(f"Table not found in mappings: {table_name}")
         raise HTTPException(status_code=404, detail="Table not found")
     
-    model = TABLE_MODEL_MAPPING[table_name]
-    schema = TABLE_SCHEMA_MAPPING[table_name]["read"]
-    
+    logger.info(f"Querying database for table: {table_name}")
     items = db.query(model).offset(skip).limit(limit).all()
-    logger.info(f"Retrieved {len(items)} items from the database")
-    
-    # Get the column names
+    logger.info(f"Retrieved {len(items)} items from the database for table: {table_name}")
+
     columns = model.__table__.columns.keys()
+    result = [schema(**item.__dict__) for item in items]
 
-    # TODO: Investigate why return [schema.from_orm(item) for item in items] is not working as intended
-    if table_name == 'table_one':
-        result = [schema(id=item.id, name=item.name, description=item.description) for item in items]
-    elif table_name == 'table_two':
-        result = [schema(id=item.id, title=item.title, details=item.details, category=item.category) for item in items]
-    else:
-        logger.error(f"Unsupported table: {table_name}")
-        raise HTTPException(status_code=404, detail=f"Unsupported table: {table_name}")
-
-    logger.info("Ending /read endpoint")
+    logger.info(f"Returning columns and data for table: {table_name}")
     return {"columns": list(columns), "data": result}
 
 @app.post("/update")
 async def update_table(request: Update, db: Session = Depends(get_db)):
-    logger.info("Starting /update endpoint")
     table_name = request.table_name
     updates = request.updates
     removed_row_ids = request.removed_row_ids
-    
-    if table_name not in TABLE_MODEL_MAPPING or table_name not in TABLE_SCHEMA_MAPPING:
-        logger.error(f"Table not found: {table_name}")
-        raise HTTPException(status_code=404, detail="Table not found")
-    
-    model = TABLE_MODEL_MAPPING[table_name]
-    schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
 
-    # Handle removed rows
+    logger.info(f"Executing /update endpoint for table: {table_name}")
+
+    logger.info(f"Checking if table {table_name} is in mappings and defining model and schema")
+    if table_name in TABLE_MODEL_MAPPING and table_name in TABLE_SCHEMA_MAPPING:
+        model = TABLE_MODEL_MAPPING[table_name]
+        schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
+    else:
+        logger.error(f"Table not found in mappings: {table_name}")
+        raise HTTPException(status_code=404, detail="Table not found")
+
+    logger.info(f"Deleting rows from table: {table_name}")
     for row_id in removed_row_ids:
         db_item = db.query(model).filter(model.id == row_id).first()
         if db_item:
             db.delete(db_item)
+            logger.info(f"Deleted item with id {row_id} from table: {table_name}")
         else:
             logger.error(f"Item with id {row_id} not found")
             raise HTTPException(status_code=404, detail=f"Item with id {row_id} not found")
-    
-    # Handle updated and new rows
+
+    logger.info(f"Handling updated and new rows for table: {table_name}")
     for update_instance in updates.data:
         update_dict = update_instance.dict(exclude_unset=True)
         item_id = update_dict.pop("id", None)
-        
-        # Validate the update data
+
+        logger.info(f"Validating update instance against schema: {update_dict}")
         try:
             schema(**update_dict)
         except ValueError as e:
             logger.error(f"Invalid update data: {update_dict}, error: {str(e)}")
             raise HTTPException(status_code=400, detail=f"Invalid update data: {update_dict}, error: {str(e)}")
-        
+
+        logger.info(f"Checking if item already exist in the database")
         if item_id is not None and item_id >= 0:
-            # Update the existing row if item_id is not None and not negative
+            logger.info(f"Updating item with id {item_id}")
             db_item = db.query(model).filter(model.id == item_id).first()
             if not db_item:
                 logger.error(f"Item with id {item_id} not found")
@@ -96,11 +93,11 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
             for key, value in update_dict.items():
                 setattr(db_item, key, value)
         else:
-            # Create a new row if item_id is None or negative
+            logger.info(f"Creating new item for added row")
             db_item = model(**update_dict)
             db.add(db_item)
-    
+
     db.commit()
-    logger.info("Ending /update endpoint")
+    logger.info(f"Committing changes to the database")
     return {"message": "Update successful"}
 
