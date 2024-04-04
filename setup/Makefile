@@ -6,7 +6,7 @@ SCHEMA = schema.json
 # Database setup variables
 # init.sql
 DB_INIT_SCRIPT = ./database/create_init.sql.sh
-DB_DATA_TYPE_MAPPING = ./database/data_type_mapping.json
+DB_DATA_TYPE_MAPPING = ./database/database_type_mapping.json
 DB_TYPE = postgresql  # Change this to the database type you want to use i.e. mssql
 DB_OUTPUT = ../database/autogen_init.sql
 
