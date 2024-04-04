@@ -25,9 +25,18 @@ BE_MODELS_OUTPUT = ../backend/models/autogen_models.py
 BE_SCHEMAS_SCRIPT = ./backend/create_schemas.py.sh
 BE_SCHEMAS_OUTPUT = ../backend/models/autogen_schemas.py
 
-.PHONY: all database backend clean
+# Frontend setup variables
+# App.tsx
+FE_APP_SCRIPT = ./frontend/create_App.tsx.sh
+FE_APP_OUTPUT = ../frontend/src/autogen_App.tsx
 
-all: clean database backend
+# HomePage.tsx
+FE_HOME_SCRIPT = ./frontend/create_HomePage.tsx.sh
+FE_HOME_OUTPUT = ../frontend/src/pages/autogen_HomePage.tsx
+
+.PHONY: all database backend frontend clean
+
+all: clean database backend frontend
 
 clean:
 	@rm -f $(DB_OUTPUT)
@@ -44,3 +53,9 @@ backend:
 	@./$(BE_MODELS_SCRIPT) $(SCHEMA) $(BE_DATA_TYPE_MAPPING) $(BE_MODELS_OUTPUT) $(DB_TYPE) $(BE_DATABASE_MAPPING)
 	@chmod +x $(BE_SCHEMAS_SCRIPT)
 	@./$(BE_SCHEMAS_SCRIPT) $(SCHEMA) $(BE_SCHEMAS_OUTPUT) 
+
+frontend:
+	@chmod +x $(FE_APP_SCRIPT)
+	@./$(FE_APP_SCRIPT) $(SCHEMA) $(FE_APP_OUTPUT)
+	@chmod +x $(FE_HOME_SCRIPT)
+	@./$(FE_HOME_SCRIPT) $(SCHEMA) $(FE_HOME_OUTPUT)
