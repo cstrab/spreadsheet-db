@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
+import { fetchData, updateData } from '../../api/api';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { fetchData, updateData } from '../../api/api';
-// import Papa from 'papaparse';
 
-const RemoveButtonRenderer = (props: ICellRendererParams) => {
-  return <button onClick={() => props.context.handleRemoveRow(props)}>Remove</button>;
-};
-
+// Generic grid component that displays data from the backend
 const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [rowData, setRowData] = useState<any[]>([]);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
-  // const [file, setFile] = useState<File | null>(null);
+  const gridApiRef = useRef<GridApi | null>(null);
+  const tempId = useRef(-1);  
 
+  // Fetches data from the backend and sets columnDefs whenever tableName changes
   useEffect(() => {
     fetchData(tableName)
       .then(response => {
@@ -44,52 +42,44 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
       })
       .catch(error => console.error('Error:', error));
   }, [tableName]);  
+
+  // Adds a new row to the grid with the current filters applied
+  const handleAddRow = () => {
+    const filterModel = gridApiRef.current?.getFilterModel();
   
-  const onCellValueChanged = ({ data }: { data: any }) => {
-    setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
+    const newRow = columnDefs.reduce((acc, colDef) => {
+      if (colDef.field && colDef.field !== 'id') {
+        if (filterModel && filterModel[colDef.field]) {
+          acc[colDef.field] = filterModel[colDef.field].filter;
+        } else {
+          acc[colDef.field] = '';
+        }
+      } else if (colDef.field === 'id') {
+        acc[colDef.field] = tempId.current--;
+      }
+      return acc;
+    }, {} as Record<string, any>);
+  
+    setRowData(prev => [...prev, newRow]);
+  };  
+  
+  // Removes a row from the grid and adds the id to removedRowIds
+  const handleRemoveRow = (params: ICellRendererParams) => {
+    const idToRemove = params.data.id;
+    setRowData(prev => prev.filter(row => row.id !== idToRemove));
+  
+    if (idToRemove !== undefined && idToRemove >= 0) {
+      setRemovedRowIds(prev => [...prev, idToRemove]);
+    }
+  
+    setChanges(prev => {
+      const newChanges: Record<string | number, any> = { ...prev };
+      delete newChanges[idToRemove];
+      return newChanges;
+    });
   };
 
-  // TODO: WIP
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFile(e.target.files ? e.target.files[0] : null);
-  // };
-
-  // TODO: WIP
-  // const handleUpload = () => {
-  //   if (file) {
-  //     Papa.parse(file, {
-  //       header: true,
-  //       dynamicTyping: true,
-  //       skipEmptyLines: true,
-  //       complete: function(results: { data: Record<string, any>[] }) {
-  //         const { data } = results;
-    
-  //         // Prepare payload
-  //         const updates = data.map((row: Record<string, any>, index) => {
-  //           const entry: Record<string, any> = { id: -index - 1 };  // Assign negative IDs
-  //           for (const field in row) {
-  //             if (field !== 'remove') {
-  //               const values = row[field].split(',');
-  //               const fields = columnDefs.map(colDef => colDef.field).filter(field => field !== 'remove' && field !== 'id') as string[];  // Get the actual dynamic fields
-  //               const fieldIndices: Record<string, number> = fields.reduce((acc, field, i) => ({ ...acc, [field]: i }), {});  // Create a mapping from field names to indices
-  //               fields.forEach((field: string) => {
-  //                 if (fieldIndices[field] !== undefined) {
-  //                   entry[field] = values[fieldIndices[field]];
-  //                 }
-  //               });
-  //             }
-  //           }
-  //           return entry;
-  //         });
-    
-  //         // Add new rows to rowData and changes
-  //         setRowData(prev => [...prev, ...updates]);
-  //         setChanges(prev => ({ ...prev, ...Object.fromEntries(updates.map(row => [row.id, row])) }));
-  //       }
-  //     });
-  //   }
-  // };
-  
+  // Updates the data in the backend with the changes and provides removedRowIds for deletion
   const handleUpdate = async () => {
     const updatedData = Object.values(changes);
     try {
@@ -106,53 +96,20 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     }
   };
 
-  const tempId = useRef(-1);  // Use useRef instead of let
+  // Updates the changes object whenever a cell value is changed  
+  const onCellValueChanged = ({ data }: { data: any }) => {
+    setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
+  };
 
-  const gridApiRef = useRef<GridApi | null>(null);
-
+  // Required to access the grid API for editing
   const onGridReady = (params: any) => {
     gridApiRef.current = params.api;
   };
 
-  const handleAddRow = () => {
-    // Get the current filter model
-    const filterModel = gridApiRef.current?.getFilterModel();
-  
-    const newRow = columnDefs.reduce((acc, colDef) => {
-      if (colDef.field && colDef.field !== 'id') {
-        // If a filter is applied to this column, use the filter value
-        if (filterModel && filterModel[colDef.field]) {
-          acc[colDef.field] = filterModel[colDef.field].filter;
-        } else {
-          acc[colDef.field] = '';
-        }
-      } else if (colDef.field === 'id') {
-        acc[colDef.field] = tempId.current--;
-      }
-      return acc;
-    }, {} as Record<string, any>);
-  
-    setRowData(prev => [...prev, newRow]);
-  };  
-  
-  const handleRemoveRow = (params: ICellRendererParams) => {
-    const idToRemove = params.data.id;
-    // Filter out the row immediately for visual feedback
-    setRowData(prev => prev.filter(row => row.id !== idToRemove));
-  
-    // Only add the id to removedRowIds if it is defined and not negative
-    if (idToRemove !== undefined && idToRemove >= 0) {
-      setRemovedRowIds(prev => [...prev, idToRemove]);
-    }
-  
-    // Remove the row from changes if it's there
-    setChanges(prev => {
-      const newChanges: Record<string | number, any> = { ...prev };
-      delete newChanges[idToRemove];
-      return newChanges;
-    });
+  // Custom cell renderer for the remove button column
+  const RemoveButtonRenderer = (props: ICellRendererParams) => {
+    return <button onClick={() => handleRemoveRow(props)}>Remove</button>;
   };
-
 
   return (
     <div className="ag-theme-quartz" style={{ height: 500 }}>
@@ -161,10 +118,8 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         columnDefs={columnDefs}
         onCellValueChanged={onCellValueChanged}
         context={{ handleRemoveRow }}
-        onGridReady={onGridReady}  // Add this line
+        onGridReady={onGridReady} 
       />
-      {/* <input type="file" onChange={handleFileChange} /> */}
-      {/* <button onClick={handleUpload}>Upload CSV</button> */}
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow}>Add Row</button>
     </div>
