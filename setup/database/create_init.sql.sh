@@ -8,7 +8,7 @@ fi
 
 # Read the schema.json file and data type mapping file
 schema_file=$(cat $1)
-database_type_mapping=$(cat $2)
+database_type_mapping_file=$(cat $2)
 database_type=$3
 output_file=$4
 
@@ -39,7 +39,7 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
         data_type=$(echo $column | jq -r .data_type)
 
         # Map the data type to a database-specific data type
-        data_type=$(echo $database_type_mapping | jq -r ".$database_type.$data_type")
+        data_type=$(echo $database_type_mapping_file | jq -r ".$database_type.$data_type")
 
         # Add a comma if this is not the first column
         if [ "$first_column" != true ]; then

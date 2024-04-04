@@ -12,7 +12,7 @@ if [ $# -ne 2 ]; then
 fi
 
 # Read the schema.json file
-schema=$(cat $1)
+schema_file=$(cat $1)
 output_file=$2
 
 # Start the Python file
@@ -27,7 +27,7 @@ echo "logger = setup_logger('backend')" >> $output_file
 echo "" >> $output_file
 
 # Loop over the tables to create the classes
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 
@@ -97,7 +97,7 @@ echo "    table_name: str" >> $output_file
 echo "    updates: Union[" >> $output_file
 
 # Loop over the tables to add them to the Union
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 
@@ -120,7 +120,7 @@ echo "        table_name = values.get('table_name')" >> $output_file
 first_table=true
 
 # Loop over the tables to add them to the validator
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 

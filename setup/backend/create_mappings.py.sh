@@ -12,7 +12,7 @@ if [ $# -ne 2 ]; then
 fi
 
 # Read the schema.json file
-schema=$(cat $1)
+schema_file=$(cat $1)
 output_file=$2
 
 # Start the mappings.py file
@@ -24,7 +24,7 @@ model_names="Base, "
 schema_names=""
 
 # Loop over the tables to accumulate the model and schema names
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 
@@ -50,7 +50,7 @@ echo "" >> $output_file
 echo "TABLE_MODEL_MAPPING: Dict[str, Type[Base]] = {" >> $output_file
 
 # Loop over the tables to add them to the TABLE_MODEL_MAPPING
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 
@@ -67,7 +67,7 @@ echo "" >> $output_file
 echo "TABLE_SCHEMA_MAPPING: Dict[str, Dict[str, Any]] = {" >> $output_file
 
 # Loop over the tables to add them to the TABLE_SCHEMA_MAPPING
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 

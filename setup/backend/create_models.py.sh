@@ -12,14 +12,14 @@ if [ $# -ne 5 ]; then
 fi
 
 # Read the schema.json file and mapping file
-schema=$(cat $1)
+schema_file=$(cat $1)
 mapping=$(cat $2)
 output_file=$3
 database_type=$4
 database_mapping_file=$5
 
 # Extract the schema name from the schema file
-schema_name=$(echo $schema | jq -r '.schema_name')
+schema_name=$(echo $schema_file | jq -r '.schema_name')
 
 # Read the database_mapping.json file
 database_mapping=$(cat $database_mapping_file)
@@ -35,7 +35,7 @@ echo "" >> $output_file
 declare -a data_types=("Column" "create_engine")
 
 # Loop over the tables to find the unique data types
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 
@@ -80,7 +80,7 @@ echo "Base = declarative_base()" >> $output_file
 echo "" >> $output_file
 
 # Loop over the tables to create the classes
-for table in $(echo $schema | jq -r '.tables[] | @base64'); do
+for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Decode the table JSON
     table=$(echo $table | base64 --decode)
 
