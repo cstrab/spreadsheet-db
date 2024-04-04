@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+
 DATABASE_TYPE = 'postgresql'
 DATABASE_USER = os.getenv('POSTGRES_USER')  
 DATABASE_PASSWORD = os.getenv('POSTGRES_PASSWORD') 

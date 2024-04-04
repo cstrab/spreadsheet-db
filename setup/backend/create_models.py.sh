@@ -66,6 +66,7 @@ echo "from sqlalchemy import $imports" >> $output_file
 echo "from sqlalchemy.ext.declarative import declarative_base" >> $output_file
 echo "from sqlalchemy.orm import sessionmaker" >> $output_file
 echo "" >> $output_file
+echo "" >> $output_file
 
 # Add the dynamic database type and environment variables to the file
 echo "DATABASE_TYPE = '$database_type'" >> $output_file

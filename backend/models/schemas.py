@@ -23,10 +23,6 @@ class TableOneUpdate(BaseModel):
 class TableOneRead(TableOneBase):
     id: int
 
-    # TODO: Investigate why this is not working as intended
-    # class Config:
-    #     orm_mode = True
-
 class TableOneListUpdate(BaseModel):
     data: List[TableOneUpdate]
 
@@ -47,10 +43,6 @@ class TableTwoUpdate(BaseModel):
 
 class TableTwoRead(TableTwoBase):
     id: int
-
-    # TODO: Investigate why this is not working as intended
-    # class Config:
-    #     orm_mode = True
 
 class TableTwoListUpdate(BaseModel):
     data: List[TableTwoUpdate]

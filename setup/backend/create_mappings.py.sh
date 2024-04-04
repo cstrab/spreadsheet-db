@@ -17,6 +17,7 @@ output_file=$2
 
 # Start the mappings.py file
 echo "from typing import Dict, Type, Any" > $output_file
+echo "" >> $output_file
 
 # Initialize the model and schema names strings
 model_names="Base, "
@@ -44,6 +45,7 @@ echo "from models.models import $model_names" >> $output_file
 echo "from models.schemas import (" >> $output_file
 echo -e "$schema_names)" >> $output_file
 
+echo "" >> $output_file
 echo "" >> $output_file
 echo "TABLE_MODEL_MAPPING: Dict[str, Type[Base]] = {" >> $output_file
 

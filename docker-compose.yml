@@ -1,9 +1,9 @@
 version: '3.8'
 services:
-  # setup:
-  #   build: ./setup
-  #   volumes:
-  #     - .:/app
+  setup:
+    build: ./setup
+    volumes:
+      - .:/app
 
   database:
     image: postgres:latest
@@ -16,8 +16,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data  
       - ./database:/docker-entrypoint-initdb.d
-    # depends_on:
-    #   - setup
+    depends_on:
+      - setup
 
   backend:
     build: ./backend

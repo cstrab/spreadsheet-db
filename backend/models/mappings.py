@@ -1,8 +1,9 @@
 from typing import Dict, Type, Any
+
 from models.models import Base, TableOne, TableTwo
 from models.schemas import (
     TableOneRead, TableOneUpdate, TableOneListUpdate, 
-    TableTwoRead, TableTwoUpdate, TableTwoListUpdate
+    TableTwoRead, TableTwoUpdate, TableTwoListUpdate,
 )
 
 
