@@ -12,9 +12,6 @@ class TableOneBase(BaseModel):
     name: Optional[str]
     description: Optional[str]
 
-class TableOneCreate(TableOneBase):
-    pass
-
 class TableOneUpdate(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
@@ -31,9 +28,6 @@ class TableTwoBase(BaseModel):
     title: Optional[str]
     details: Optional[str]
     category: Optional[str]
-
-class TableTwoCreate(TableTwoBase):
-    pass
 
 class TableTwoUpdate(BaseModel):
     id: Optional[int] = None
@@ -56,7 +50,10 @@ class Read(BaseModel):
 # Schema for update operations
 class Update(BaseModel):
     table_name: str
-    updates: Union[TableOneListUpdate, TableTwoListUpdate]
+    updates: Union[
+        TableOneListUpdate, 
+        TableTwoListUpdate,
+    ]
     removed_row_ids: List[int]
 
     @validator('updates', pre=True)
