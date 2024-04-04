@@ -5,6 +5,11 @@ import { fetchData, updateData } from '../../api/api';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
+// Custom cell renderer for the remove button column
+const RemoveButtonRenderer = (props: ICellRendererParams) => {
+  return <button onClick={() => props.context.handleRemoveRow(props)}>Remove</button>;
+};
+
 // Generic grid component that displays data from the backend
 const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [rowData, setRowData] = useState<any[]>([]);
@@ -104,11 +109,6 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   // Required to access the grid API for editing
   const onGridReady = (params: any) => {
     gridApiRef.current = params.api;
-  };
-
-  // Custom cell renderer for the remove button column
-  const RemoveButtonRenderer = (props: ICellRendererParams) => {
-    return <button onClick={() => handleRemoveRow(props)}>Remove</button>;
   };
 
   return (
