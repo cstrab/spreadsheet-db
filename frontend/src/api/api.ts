@@ -20,3 +20,11 @@ export const updateData = async (tableName: string, data: any[], removedRowIds: 
   };
   await axios.post(`http://${API_HOST}:${API_PORT}/update`, payload);
 };
+
+export const bulkUpdateData = async (tableName: string, data: any[]) => {
+  const payload = {
+    table_name: tableName,
+    updates: { data }
+  };
+  await axios.post(`http://${API_HOST}:${API_PORT}/bulk-update`, payload);
+};

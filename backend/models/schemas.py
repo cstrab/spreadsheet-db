@@ -1,6 +1,6 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any, Dict, Type
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, ValidationError
 
 from utils.logger import setup_logger
 
@@ -47,25 +47,33 @@ class Read(BaseModel):
     skip: int = 0
     limit: int = 100
 
-# Schema for update operations
-class Update(BaseModel):
+# Function to validate update data based on table_name
+def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[BaseModel]]) -> Any:
+    if table_name in model_mapping:
+        schema = model_mapping[table_name]
+        try:
+            return schema(**v)
+        except ValidationError as e:
+            logger.error(f"Invalid update data for table {table_name}: {e}")
+            raise ValueError(f"Invalid update data for table {table_name}: {e}")
+    else:
+        logger.error(f"Table not found in mappings: {table_name}")
+        raise ValueError(f"Table not found in mappings: {table_name}")
+
+# Schema for bulk update operations
+class BulkUpdate(BaseModel):
     table_name: str
-    updates: Union[
-        TableOneListUpdate, 
-        TableTwoListUpdate,
-    ]
-    removed_row_ids: List[int]
+    updates: Union[TableOneListUpdate, TableTwoListUpdate]
 
     @validator('updates', pre=True)
     def set_updates(cls, v, values):
         table_name = values.get('table_name')
-        if table_name == 'table_one':
-            logger.info("Using TableOneListUpdate schema for updates")
-            return TableOneListUpdate(**v)
-        elif table_name == 'table_two':
-            logger.info("Using TableTwoListUpdate schema for updates")
-            return TableTwoListUpdate(**v)
-        else:
-            logger.error(f"Invalid table_name: {table_name}")
-            raise ValueError('Invalid table_name')
-        
+        logger.info(f"Validating bulk updates for table: {table_name}")
+        return validate_update_data(v, table_name, {
+            'table_one': TableOneListUpdate,
+            'table_two': TableTwoListUpdate
+        })
+
+# Schema for update operations
+class Update(BulkUpdate):
+    removed_row_ids: List[int]

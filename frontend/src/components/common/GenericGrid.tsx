@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
-import { fetchData, updateData } from '../../api/api';
+import { fetchData, updateData, bulkUpdateData } from '../../api/api';
 import { parseXLSX } from '../../utils/xlsxParser';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 // Custom cell renderer for the remove button column
 const RemoveButtonRenderer = (props: ICellRendererParams) => {
-  return <button onClick={() => props.context.handleRemoveRow(props)}>Remove</button>;
+  return <button onClick={() => props.context.handleRemoveRow(props)} disabled={props.context.isFileUploaded}>Remove</button>;
 };
 
 // Generic grid component that displays data from the backend
@@ -17,6 +17,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
   const gridApiRef = useRef<GridApi | null>(null);
   const tempId = useRef(-1);  
 
@@ -94,20 +95,41 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
 
   // Updates the data in the backend with the changes and provides removedRowIds for deletion
   const handleUpdate = async () => {
-    const updatedData = Object.values(changes);
-    try {
-      await updateData(tableName, updatedData, removedRowIds);
-      alert('Updated successfully!');
-      setRemovedRowIds([]);
-      const refreshedResponse = await fetchData(tableName);
-      const { data } = refreshedResponse;
-      setRowData(data);
-      setChanges({});
-    } catch (error) {
-      console.error('Failed to update:', error);
-      alert('Failed to update. Please try again.');
+    if (isFileUploaded) {
+      // If a file has been uploaded, use the bulk update endpoint.
+      try {
+        // Since we're doing a bulk update, we use the entire rowData.
+        await bulkUpdateData(tableName, rowData);
+        alert('Bulk update successful!');
+        setIsFileUploaded(false); // Reset file upload state for future updates.
+        
+        // Optionally, you might want to refetch the data here to ensure the grid reflects the backend state.
+        const refreshedResponse = await fetchData(tableName);
+        const { data } = refreshedResponse;
+        setRowData(data); // Update the grid with the fresh data.
+      } catch (error) {
+        console.error('Failed to bulk update:', error);
+        alert('Failed to bulk update. Please try again.');
+      }
+    } else {
+      // If no file has been uploaded, proceed with the standard update.
+      const updatedData = Object.values(changes); // Gather all changes for the update.
+      try {
+        await updateData(tableName, updatedData, removedRowIds); // Perform the standard update.
+        alert('Updated successfully!');
+        setRemovedRowIds([]); // Clear the IDs of removed rows post-update.
+        setChanges({}); // Reset changes after successful update.
+  
+        // Refetch the data to reflect the current backend state.
+        const refreshedResponse = await fetchData(tableName);
+        const { data } = refreshedResponse;
+        setRowData(data); // Update the grid with the fresh data.
+      } catch (error) {
+        console.error('Failed to update:', error);
+        alert('Failed to update. Please try again.');
+      }
     }
-  };
+  };  
 
   // Parses the uploaded XLSX file and updates the rowData if the format is valid
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -116,13 +138,15 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   
     const { data, isValid } = await parseXLSX(file);
     if (isValid) {
-      // Replace the current rowData with the new data
       console.log("Data:", data);
       setRowData(data);
       console.log("RowData:", rowData);
+      setIsFileUploaded(true); // Indicate that a file has been uploaded
+      setRemovedRowIds([]); // Clear since bulk update doesn't use this
+      setChanges({}); // Clear changes as we're replacing the data
     } else {
       alert('Invalid XLSX format for this table.');
-    }
+    }    
   };
   
   // Updates the changes object whenever a cell value is changed  
@@ -141,12 +165,12 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         rowData={rowData}
         columnDefs={columnDefs}
         onCellValueChanged={onCellValueChanged}
-        context={{ handleRemoveRow }}
+        context={{ handleRemoveRow, isFileUploaded }}
         onGridReady={onGridReady} 
       />
       <input type="file" accept=".xlsx" onChange={handleFileUpload} />
       <button onClick={handleUpdate}>Update</button>
-      <button onClick={handleAddRow}>Add Row</button>
+      <button onClick={handleAddRow} disabled={isFileUploaded}>Add Row</button>
     </div>
   );
 };

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.schemas import Read, Update
+from models.schemas import Read, Update, BulkUpdate
 from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
 from utils.database import get_db
 from utils.logger import setup_logger
@@ -101,3 +101,33 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     logger.info(f"Committing changes to the database")
     return {"message": "Update successful"}
 
+@app.post("/bulk-update")
+async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
+    table_name = request.table_name
+    updates = request.updates.data
+
+    logger.info(f"Executing /bulk-update endpoint for table: {table_name}")
+
+    if table_name not in TABLE_MODEL_MAPPING:
+        logger.error(f"Table not found in mappings: {table_name}")
+        raise HTTPException(status_code=404, detail="Table not found")
+
+    model = TABLE_MODEL_MAPPING[table_name]
+
+    try:
+        logger.info(f"Clearing all entries from table: {table_name}")
+        db.query(model).delete()
+
+        for update_instance in updates:
+            update_dict = update_instance.dict(exclude={'id'}) 
+            db_item = model(**update_dict)
+            db.add(db_item)
+
+        db.commit()
+        logger.info(f"Successfully updated table {table_name} with new data")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to update table {table_name}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update data")
+
+    return {"message": "Bulk update successful"}
