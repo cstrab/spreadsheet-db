@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
 import { fetchData, updateData } from '../../api/api';
+import { parseXLSX } from '../../utils/xlsxParser';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -19,6 +20,12 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const gridApiRef = useRef<GridApi | null>(null);
   const tempId = useRef(-1);  
 
+  // Logs the updated state of rowData whenever it changes
+  useEffect(() => {
+    // This will log the updated state of rowData every time it changes.
+    console.log("RowData after update:", rowData);
+  }, [rowData]); // Dependency array, re-run this effect when rowData changes.
+  
   // Fetches data from the backend and sets columnDefs whenever tableName changes
   useEffect(() => {
     fetchData(tableName)
@@ -44,6 +51,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         });
   
         setColumnDefs(defs);
+        console.log("Set ColumnDefs:", defs);
       })
       .catch(error => console.error('Error:', error));
   }, [tableName]);  
@@ -101,6 +109,22 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     }
   };
 
+  // Parses the uploaded XLSX file and updates the rowData if the format is valid
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+  
+    const { data, isValid } = await parseXLSX(file);
+    if (isValid) {
+      // Replace the current rowData with the new data
+      console.log("Data:", data);
+      setRowData(data);
+      console.log("RowData:", rowData);
+    } else {
+      alert('Invalid XLSX format for this table.');
+    }
+  };
+  
   // Updates the changes object whenever a cell value is changed  
   const onCellValueChanged = ({ data }: { data: any }) => {
     setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
@@ -120,6 +144,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         context={{ handleRemoveRow }}
         onGridReady={onGridReady} 
       />
+      <input type="file" accept=".xlsx" onChange={handleFileUpload} />
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow}>Add Row</button>
     </div>
