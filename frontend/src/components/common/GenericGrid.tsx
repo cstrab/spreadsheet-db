@@ -21,11 +21,10 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const gridApiRef = useRef<GridApi | null>(null);
   const tempId = useRef(-1);  
 
-  // Logs the updated state of rowData whenever it changes
+  // Temporary logs the updated state of rowData whenever it changes
   useEffect(() => {
-    // This will log the updated state of rowData every time it changes.
     console.log("RowData after update:", rowData);
-  }, [rowData]); // Dependency array, re-run this effect when rowData changes.
+  }, [rowData]); 
   
   // Fetches data from the backend and sets columnDefs whenever tableName changes
   useEffect(() => {
@@ -96,34 +95,35 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   // Updates the data in the backend with the changes and provides removedRowIds for deletion
   const handleUpdate = async () => {
     if (isFileUploaded) {
-      // If a file has been uploaded, use the bulk update endpoint.
+      // If a file has been uploaded, use the bulk-update endpoint
       try {
-        // Since we're doing a bulk update, we use the entire rowData.
+        // Since we're doing a bulk update, we use the entire rowData
         await bulkUpdateData(tableName, rowData);
         alert('Bulk update successful!');
-        setIsFileUploaded(false); // Reset file upload state for future updates.
+        setIsFileUploaded(false); 
+        const fileInput = document.querySelector('input[type="file"]');
         
-        // Optionally, you might want to refetch the data here to ensure the grid reflects the backend state.
+        // Refetch the data here to ensure the grid reflects the backend state
         const refreshedResponse = await fetchData(tableName);
         const { data } = refreshedResponse;
-        setRowData(data); // Update the grid with the fresh data.
+        setRowData(data); 
       } catch (error) {
-        console.error('Failed to bulk update:', error);
+        console.error('Failed bulk update:', error);
         alert('Failed to bulk update. Please try again.');
       }
     } else {
-      // If no file has been uploaded, proceed with the standard update.
-      const updatedData = Object.values(changes); // Gather all changes for the update.
+      // If no file has been uploaded use update endpoint
+      const updatedData = Object.values(changes); 
       try {
-        await updateData(tableName, updatedData, removedRowIds); // Perform the standard update.
-        alert('Updated successfully!');
-        setRemovedRowIds([]); // Clear the IDs of removed rows post-update.
-        setChanges({}); // Reset changes after successful update.
+        await updateData(tableName, updatedData, removedRowIds); 
+        alert('Update successful!');
+        setRemovedRowIds([]); 
+        setChanges({}); 
   
-        // Refetch the data to reflect the current backend state.
+        // Refetch the data here to ensure the grid reflects the backend state
         const refreshedResponse = await fetchData(tableName);
         const { data } = refreshedResponse;
-        setRowData(data); // Update the grid with the fresh data.
+        setRowData(data); 
       } catch (error) {
         console.error('Failed to update:', error);
         alert('Failed to update. Please try again.');
@@ -141,9 +141,9 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
       console.log("Data:", data);
       setRowData(data);
       console.log("RowData:", rowData);
-      setIsFileUploaded(true); // Indicate that a file has been uploaded
-      setRemovedRowIds([]); // Clear since bulk update doesn't use this
-      setChanges({}); // Clear changes as we're replacing the data
+      setIsFileUploaded(true); 
+      setRemovedRowIds([]); 
+      setChanges({}); 
     } else {
       alert('Invalid XLSX format for this table.');
     }    
