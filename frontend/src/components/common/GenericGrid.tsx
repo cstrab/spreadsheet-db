@@ -136,7 +136,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
   
-    const { data, isValid } = await parseXLSX(file);
+    const { data, isValid } = await parseXLSX(file, columnDefs);
     if (isValid) {
       console.log("Data:", data);
       setRowData(data);

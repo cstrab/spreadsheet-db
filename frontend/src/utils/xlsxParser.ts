@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import { ColDef } from 'ag-grid-community';
 
-export const parseXLSX = async (file: File): Promise<{data: Array<Record<string, any>>, isValid: boolean}> => {
+export const parseXLSX = async (file: File, columnDefs: ColDef[]): Promise<{data: Array<Record<string, any>>, isValid: boolean}> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -13,20 +13,31 @@ export const parseXLSX = async (file: File): Promise<{data: Array<Record<string,
 
       // Type assertion to ensure rows.shift() is treated as an array of strings
       const headers = (rows.shift() || []).map(header => header.toString().toLowerCase());
-      const dataWithTempIds = rows.map((row, index) => {
-        const rowObj = headers.reduce<Record<string, any>>((obj, header, i) => {
-          // Type assertion for row[i] to treat it as any type, which allows assignment
-          obj[header] = row[i] || ''; 
-          return obj;
-        }, {});
 
-        return {
-          ...rowObj,
-          id: -(index + 1) // Assign temporary negative IDs
-        };
-      });
+      // Check if headers match columnDefs fields
+      const columnFields = columnDefs
+        .filter(colDef => colDef.field !== undefined)
+        .map(colDef => colDef.field!.toLowerCase());
 
-      resolve({ data: dataWithTempIds, isValid: dataWithTempIds.length > 0 });
+      const isValid = headers.every(header => columnFields.includes(header));
+
+      if (isValid) {
+        const dataWithTempIds = rows.map((row, index) => {
+          const rowObj = headers.reduce<Record<string, any>>((obj, header, i) => {
+            obj[header] = row[i] || ''; 
+            return obj;
+          }, {});
+
+          return {
+            ...rowObj,
+            id: -(index + 1) 
+          };
+        });
+
+        resolve({ data: dataWithTempIds, isValid: dataWithTempIds.length > 0 });
+      } else {
+        resolve({ data: [], isValid: false });
+      }
     };
     reader.onerror = (error) => reject(error);
     reader.readAsBinaryString(file);
