@@ -65,7 +65,8 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         if (filterModel && filterModel[colDef.field]) {
           acc[colDef.field] = filterModel[colDef.field].filter;
         } else {
-          acc[colDef.field] = '';
+          // Check if the column type is not a string, if so, set the initial value to null
+          acc[colDef.field] = colDef.type === 'string' ? '' : null;
         }
       } else if (colDef.field === 'id') {
         acc[colDef.field] = tempId.current--;
@@ -129,6 +130,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
       }
     }
     // Refetch the data here to ensure the grid reflects the backend state
+    setChanges({});
     const refreshedResponse = await fetchData(tableName);
     const { data } = refreshedResponse;
     setRowData(data); 

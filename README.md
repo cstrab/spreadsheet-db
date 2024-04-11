@@ -23,7 +23,7 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
 
 - [x] Frontend:
     - [x] Common component for displaying/editing database tables utilizing backend endpoints in excel-like grid format
-    - [x] Import .csv feature to bulk update database tables
+    - [x] Import .xlsx feature to bulk update database tables
     - [x] Basic logging
     - [x] Dockerfile
 - [x] Backend: 
@@ -41,6 +41,8 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
 
 Current Limitations:
 - Works only for a single schema that will contain all tables
+- Handling for datatypes other than int and string in progress (float, bool, date, and datetime)
+- No frontend validation for inputs, but error will be returned from backend
+- No export .xlsx feature
 - Only PostgresSQL database type has been tested
 - Dockerfiles and docker-compose.yml are not automated by Makefile setup
-- Handling for datatypes other than int and string in progress (float, bool, date, and datetime)
