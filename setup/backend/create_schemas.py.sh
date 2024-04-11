@@ -16,7 +16,7 @@ schema_file=$(cat $1)
 output_file=$2
 
 # Start the Python file
-echo "from typing import List, Optional, Union" > $output_file
+echo "from typing import List, Optional, Union, Any, Dict, Type" > $output_file
 echo "" >> $output_file
 echo "from pydantic import BaseModel, validator" >> $output_file
 echo "" >> $output_file
@@ -91,8 +91,21 @@ echo "    table_name: str" >> $output_file
 echo "    skip: int = 0" >> $output_file
 echo "    limit: int = 100" >> $output_file
 echo "" >> $output_file
-echo "# Schema for update operations" >> $output_file
-echo "class Update(BaseModel):" >> $output_file
+echo "# Function to validate update data based on table_name" >> $output_file
+echo "def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[BaseModel]]) -> Any:" >> $output_file
+echo "    if table_name in model_mapping:" >> $output_file
+echo "        schema = model_mapping[table_name]" >> $output_file
+echo "        try:" >> $output_file
+echo "            return schema(**v)" >> $output_file
+echo "        except ValidationError as e:" >> $output_file
+echo "            logger.error(f\"Invalid update data for table {table_name}: {e}\")" >> $output_file
+echo "            raise ValueError(f\"Invalid update data for table {table_name}: {e}\")" >> $output_file
+echo "    else:" >> $output_file
+echo "        logger.error(f\"Table not found in mappings: {table_name}\")" >> $output_file
+echo "        raise ValueError(f\"Table not found in mappings: {table_name}\")" >> $output_file
+echo "" >> $output_file
+echo "# Schema for bulk update operations" >> $output_file
+echo "class BulkUpdate(BaseModel):" >> $output_file
 echo "    table_name: str" >> $output_file
 echo "    updates: Union[" >> $output_file
 
@@ -110,14 +123,12 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
 done
 
 echo "    ]" >> $output_file
-echo "    removed_row_ids: List[int]" >> $output_file
 echo "" >> $output_file
 echo "    @validator('updates', pre=True)" >> $output_file
 echo "    def set_updates(cls, v, values):" >> $output_file
 echo "        table_name = values.get('table_name')" >> $output_file
-
-# Initialize a variable to keep track of the first table
-first_table=true
+echo "        logger.info(f\"Validating bulk updates for table: {table_name}\")" >> $output_file
+echo "        return validate_update_data(v, table_name, {" >> $output_file
 
 # Loop over the tables to add them to the validator
 for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
@@ -128,19 +139,12 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     table_name=$(echo $table | jq -r .table_name)
     class_name=$(snake_to_camel $table_name)
 
-    # Check if this is the first table
-    if $first_table ; then
-        echo "        if table_name == '$table_name':" >> $output_file
-        first_table=false
-    else
-        echo "        elif table_name == '$table_name':" >> $output_file
-    fi
-
     # Add the table to the validator
-    echo "            logger.info(\"Using ${class_name}ListUpdate schema for updates\")" >> $output_file
-    echo "            return ${class_name}ListUpdate(**v)" >> $output_file
+    echo "            '${table_name}': ${class_name}ListUpdate," >> $output_file
 done
 
-echo "        else:" >> $output_file
-echo "            logger.error(f\"Invalid table_name: {table_name}\")" >> $output_file
-echo "            raise ValueError('Invalid table_name')" >> $output_file
+echo "        })" >> $output_file
+echo "" >> $output_file
+echo "# Schema for update operations" >> $output_file
+echo "class Update(BulkUpdate):" >> $output_file
+echo "    removed_row_ids: List[int]" >> $output_file
