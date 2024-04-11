@@ -1,16 +1,16 @@
 import os
 
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, create_engine, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
 DATABASE_TYPE = 'postgresql'
-DATABASE_USER = os.getenv('POSTGRES_USER')  
-DATABASE_PASSWORD = os.getenv('POSTGRES_PASSWORD') 
-DATABASE_NAME = os.getenv('POSTGRES_DB')  
-DATABASE_HOST = os.getenv('POSTGRES_HOST')  
-DATABASE_PORT = os.getenv('POSTGRES_PORT')  
+DATABASE_USER = os.getenv('POSTGRES_USER')
+DATABASE_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+DATABASE_NAME = os.getenv('POSTGRES_DB')
+DATABASE_HOST = os.getenv('POSTGRES_HOST')
+DATABASE_PORT = os.getenv('POSTGRES_PORT')
 
 Base = declarative_base()
 
@@ -28,6 +28,14 @@ class TableTwo(Base):
     title = Column(String, index=True)
     details = Column(String, index=True)
     category = Column(String, index=True)
+
+class TableThree(Base):
+    __tablename__ = 'table_three'
+    __table_args__ = {'schema': 'test_schema'}
+    id = Column(Integer, primary_key=True, index=True)
+    string_column = Column(String, index=True)
+    int_column = Column(Integer, index=True)
+    float_column = Column(Float, index=True)
 
 DATABASE_URL = f"{DATABASE_TYPE}://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 

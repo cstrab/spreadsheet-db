@@ -8,31 +8,31 @@ SCHEMA = schema.json
 DB_INIT_SCRIPT = ./database/create_init.sql.sh
 DB_DATA_TYPE_MAPPING = ./database/database_type_mapping.json
 DB_TYPE = postgresql  # Change this to the database type you want to use i.e. mssql
-DB_OUTPUT = ../database/autogen_init.sql
+DB_OUTPUT = ../database/init.sql
 
 # Backend setup variables
 # mapping.py
 BE_MAPPINGS_SCRIPT = ./backend/create_mappings.py.sh
-BE_MAPPINGS_OUTPUT = ../backend/models/autogen_mappings.py
+BE_MAPPINGS_OUTPUT = ../backend/models/mappings.py
 
 # models.py
 BE_MODELS_SCRIPT = ./backend/create_models.py.sh
 BE_DATA_TYPE_MAPPING = ./backend/data_type_mapping.json
 BE_DATABASE_MAPPING = ./backend/database_mapping.json
-BE_MODELS_OUTPUT = ../backend/models/autogen_models.py
+BE_MODELS_OUTPUT = ../backend/models/models.py
 
 # schemas.py
 BE_SCHEMAS_SCRIPT = ./backend/create_schemas.py.sh
-BE_SCHEMAS_OUTPUT = ../backend/models/autogen_schemas.py
+BE_SCHEMAS_OUTPUT = ../backend/models/schemas.py
 
 # Frontend setup variables
 # App.tsx
 FE_APP_SCRIPT = ./frontend/create_App.tsx.sh
-FE_APP_OUTPUT = ../frontend/src/autogen_App.tsx
+FE_APP_OUTPUT = ../frontend/src/App.tsx
 
 # HomePage.tsx
 FE_HOME_SCRIPT = ./frontend/create_HomePage.tsx.sh
-FE_HOME_OUTPUT = ../frontend/src/pages/autogen_HomePage.tsx
+FE_HOME_OUTPUT = ../frontend/src/pages/HomePage.tsx
 
 .PHONY: all database backend frontend clean
 

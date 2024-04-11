@@ -21,9 +21,9 @@ Goal: Application that simulates an excel-like grid displaying contents of a mul
 
 Stage: POC (Proof of Concept) - The app will be considered POC after this phase. Breaking changes are expected and more frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements.
 
-- [ ] Frontend:
+- [x] Frontend:
     - [x] Common component for displaying/editing database tables utilizing backend endpoints in excel-like grid format
-    - [ ] Import .csv feature to bulk update database tables
+    - [x] Import .csv feature to bulk update database tables
     - [x] Basic logging
     - [x] Dockerfile
 - [x] Backend: 
@@ -33,8 +33,14 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
 - [x] Database: 
     - [x] Basic Postgresql local setup with initialization .sql script
 - [x] Setup:
-    - [ ] Makefile and .sh script files for dynamically generating Frontend, Backend, Database files at project start up
+    - [x] Makefile and .sh script files for dynamically generating Frontend, Backend, Database files at project start up
 - [x] Local Testing:
     - [x] Setup docker-compose for local testing
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
+
+Current Limitations:
+- Works only for a single schema that will contain all tables
+- Only PostgresSQL database type has been tested
+- Dockerfiles and docker-compose.yml are not automated by Makefile setup
+- Handling for datatypes other than int and string in progress (float, bool, date, and datetime)

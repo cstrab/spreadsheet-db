@@ -38,6 +38,27 @@
                     "data_type": "str"
                 }
             ]
+        },
+        {
+            "table_name": "table_three",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int_id"
+                },
+                {
+                    "column_name": "string_column",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "int_column",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "float_column",
+                    "data_type": "float"
+                }
+            ]
         }
     ]
 }

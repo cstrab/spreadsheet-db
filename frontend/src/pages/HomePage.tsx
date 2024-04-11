@@ -13,6 +13,9 @@ export const HomePage: React.FC = () => {
           <li>
             <Link to="/table-two">Table Two</Link>
           </li>
+          <li>
+            <Link to="/table-three">Table Three</Link>
+          </li>
         </ul>
       </nav>
     </div>

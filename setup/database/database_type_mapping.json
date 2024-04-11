@@ -2,11 +2,13 @@
     "postgresql": {
         "int_id": "SERIAL PRIMARY KEY",
         "int": "INTEGER",
+        "float": "DOUBLE PRECISION",
         "str": "VARCHAR(255)"
     },
     "mssql": {
         "int_id": "INT IDENTITY(1,1) PRIMARY KEY",
         "int": "INT",
+        "float": "FLOAT",
         "str": "NVARCHAR(255)"
     }
 }

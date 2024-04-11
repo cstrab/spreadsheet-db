@@ -41,6 +41,24 @@ class TableTwoRead(TableTwoBase):
 class TableTwoListUpdate(BaseModel):
     data: List[TableTwoUpdate]
 
+# Schemas for TableThree
+class TableThreeBase(BaseModel):
+    string_column: Optional[str]
+    int_column: Optional[int]
+    float_column: Optional[float]
+
+class TableThreeUpdate(BaseModel):
+    id: Optional[int] = None
+    string_column: Optional[str] = None
+    int_column: Optional[int] = None
+    float_column: Optional[float] = None
+
+class TableThreeRead(TableThreeBase):
+    id: int
+
+class TableThreeListUpdate(BaseModel):
+    data: List[TableThreeUpdate]
+
 # Schema for read operations
 class Read(BaseModel):
     table_name: str
@@ -66,6 +84,7 @@ class BulkUpdate(BaseModel):
     updates: Union[
         TableOneListUpdate,
         TableTwoListUpdate,
+        TableThreeListUpdate,
     ]
 
     @validator('updates', pre=True)
@@ -75,9 +94,9 @@ class BulkUpdate(BaseModel):
         return validate_update_data(v, table_name, {
             'table_one': TableOneListUpdate,
             'table_two': TableTwoListUpdate,
+            'table_three': TableThreeListUpdate,
         })
 
 # Schema for update operations
 class Update(BulkUpdate):
     removed_row_ids: List[int]
-    
