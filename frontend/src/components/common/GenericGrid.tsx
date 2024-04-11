@@ -96,20 +96,23 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const handleUpdate = async () => {
     if (isFileUploaded) {
       // If a file has been uploaded, use the bulk-update endpoint
-      try {
-        // Since we're doing a bulk update, we use the entire rowData
-        await bulkUpdateData(tableName, rowData);
-        alert('Bulk update successful!');
-        setIsFileUploaded(false); 
-        const fileInput = document.querySelector('input[type="file"]');
-        
-        // Refetch the data here to ensure the grid reflects the backend state
-        const refreshedResponse = await fetchData(tableName);
-        const { data } = refreshedResponse;
-        setRowData(data); 
-      } catch (error) {
-        console.error('Failed bulk update:', error);
-        alert('Failed to bulk update. Please try again.');
+      if (window.confirm("Are you sure you want to perform bulk update? This will clear and replace the database")) {
+        try {
+          // Since we're doing a bulk update, we use the entire rowData
+          await bulkUpdateData(tableName, rowData);
+          alert('Bulk update successful!');
+          setIsFileUploaded(false); 
+          
+          // Clear the file input
+          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+          if (fileInput) {
+            fileInput.value = '';
+          }
+
+        } catch (error) {
+          console.error('Failed bulk update:', error);
+          alert('Failed to bulk update. Please try again.');
+        }
       }
     } else {
       // If no file has been uploaded use update endpoint
@@ -119,16 +122,16 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         alert('Update successful!');
         setRemovedRowIds([]); 
         setChanges({}); 
-  
-        // Refetch the data here to ensure the grid reflects the backend state
-        const refreshedResponse = await fetchData(tableName);
-        const { data } = refreshedResponse;
-        setRowData(data); 
+
       } catch (error) {
         console.error('Failed to update:', error);
         alert('Failed to update. Please try again.');
       }
     }
+    // Refetch the data here to ensure the grid reflects the backend state
+    const refreshedResponse = await fetchData(tableName);
+    const { data } = refreshedResponse;
+    setRowData(data); 
   };  
 
   // Parses the uploaded XLSX file and updates the rowData if the format is valid
