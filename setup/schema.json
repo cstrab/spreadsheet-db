@@ -6,7 +6,7 @@
             "columns": [
                 {
                     "column_name": "id",
-                    "data_type": "int"
+                    "data_type": "int_id"
                 },
                 {
                     "column_name": "name",
@@ -23,7 +23,7 @@
             "columns": [
                 {
                     "column_name": "id",
-                    "data_type": "int"
+                    "data_type": "int_id"
                 },
                 {
                     "column_name": "title",

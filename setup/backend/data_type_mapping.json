@@ -1,4 +1,5 @@
 {
+    "int_id": "Integer",
     "int": "Integer",
     "str": "String"
 }

@@ -149,6 +149,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
       setChanges({}); 
     } else {
       alert('Invalid XLSX format for this table.');
+      event.target.value = '';
     }    
   };
   

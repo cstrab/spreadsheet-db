@@ -63,7 +63,10 @@ def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[
 # Schema for bulk update operations
 class BulkUpdate(BaseModel):
     table_name: str
-    updates: Union[TableOneListUpdate, TableTwoListUpdate]
+    updates: Union[
+        TableOneListUpdate,
+        TableTwoListUpdate,
+    ]
 
     @validator('updates', pre=True)
     def set_updates(cls, v, values):
@@ -71,9 +74,10 @@ class BulkUpdate(BaseModel):
         logger.info(f"Validating bulk updates for table: {table_name}")
         return validate_update_data(v, table_name, {
             'table_one': TableOneListUpdate,
-            'table_two': TableTwoListUpdate
+            'table_two': TableTwoListUpdate,
         })
 
 # Schema for update operations
 class Update(BulkUpdate):
     removed_row_ids: List[int]
+    
