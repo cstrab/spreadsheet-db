@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS test_schema.table_three (
     id SERIAL PRIMARY KEY,
     string_column VARCHAR(255),
     int_column INTEGER,
-    float_column DOUBLE PRECISION
+    float_column DOUBLE PRECISION,
+    bool_column BOOLEAN
 );
 

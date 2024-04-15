@@ -66,7 +66,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
           acc[colDef.field] = filterModel[colDef.field].filter;
         } else {
           // Check if the column type is not a string, if so, set the initial value to null
-          acc[colDef.field] = colDef.type === 'string' ? '' : null;
+          acc[colDef.field] = colDef.type === 'boolean' ? false : (colDef.type === 'string' ? '' : null);
         }
       } else if (colDef.field === 'id') {
         acc[colDef.field] = tempId.current--;

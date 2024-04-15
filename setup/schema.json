@@ -57,6 +57,10 @@
                 {
                     "column_name": "float_column",
                     "data_type": "float"
+                },
+                {
+                    "column_name": "bool_column",
+                    "data_type": "bool"
                 }
             ]
         }

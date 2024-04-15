@@ -46,12 +46,14 @@ class TableThreeBase(BaseModel):
     string_column: Optional[str]
     int_column: Optional[int]
     float_column: Optional[float]
+    bool_column: Optional[bool]
 
 class TableThreeUpdate(BaseModel):
     id: Optional[int] = None
     string_column: Optional[str] = None
     int_column: Optional[int] = None
     float_column: Optional[float] = None
+    bool_column: Optional[bool] = None
 
 class TableThreeRead(TableThreeBase):
     id: int

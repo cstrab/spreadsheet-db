@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import Column, create_engine, Integer, String, Float
+from sqlalchemy import Column, create_engine, Integer, String, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -36,6 +36,7 @@ class TableThree(Base):
     string_column = Column(String, index=True)
     int_column = Column(Integer, index=True)
     float_column = Column(Float, index=True)
+    bool_column = Column(Boolean, index=True)
 
 DATABASE_URL = f"{DATABASE_TYPE}://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
