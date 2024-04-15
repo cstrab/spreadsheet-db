@@ -1,20 +1,57 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ICellRendererParams, GridApi } from 'ag-grid-community';
+import { ColDef, ICellRendererParams, GridApi, CellValueChangedEvent } from 'ag-grid-community';
 import { fetchData, updateData, bulkUpdateData } from '../../api/api';
 import { parseXLSX } from '../../utils/xlsxParser';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import '../../styles/styles.css'
+
+interface ExtendedColDef extends ColDef {
+  cellDataType?: 'number' | 'text' | 'boolean'; 
+}
 
 // Custom cell renderer for the remove button column
 const RemoveButtonRenderer = (props: ICellRendererParams) => {
   return <button onClick={() => props.context.handleRemoveRow(props)} disabled={props.context.isFileUploaded}>Remove</button>;
 };
 
+// Ensure `checkInvalidCell` function handles string type correctly
+const checkInvalidCell = (value: any, type: string): boolean => {
+  switch (type) {
+    case 'integer':
+      return value !== null && (!Number.isInteger(parseFloat(value)));
+    case 'float':
+      return value !== null && (isNaN(value) || !value.toString().includes('.'));
+    case 'varchar':
+      return value !== null && value !== '' && typeof value !== 'string';
+    case 'boolean':
+      return typeof value !== 'boolean' && value !== 'true' && value !== 'false';
+    default:
+      return false;
+  }
+};
+
+const checkRowValidity = (row: any, columns: ExtendedColDef[]): boolean => {
+  return columns.every(column => {
+    if (column.field === 'isValid' || column.field === 'remove') {
+      return true; // Skip checking our control fields
+    }
+
+    // Ensure that `column.field` and `column.cellDataType` are defined before using them
+    if (column.field && column.cellDataType) {
+      // Safely access `row[column.field]` and pass `column.cellDataType` as a string
+      return !checkInvalidCell(row[column.field], column.cellDataType);
+    }
+
+    return false; // Return false or handle differently if field or cellDataType is undefined
+  });
+};
+
 // Generic grid component that displays data from the backend
 const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [rowData, setRowData] = useState<any[]>([]);
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
+  const [columnDefs, setColumnDefs] = useState<ExtendedColDef[]>([]);
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
@@ -26,42 +63,66 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     console.log("RowData after update:", rowData);
   }, [rowData]); 
   
- // Fetches data from the backend and sets columnDefs whenever tableName changes
+  // Fetches data from the backend and sets columnDefs whenever tableName changes
   useEffect(() => {
     fetchData(tableName)
       .then(response => {
         const { columns, data } = response;
-        setRowData(data);
+  
+        // Update row data to include the validity check
+        const processedData = data.map((row: any) => ({
+          ...row,
+          isValid: checkRowValidity(row, columns)  // Calculate if the row is valid
+        }));
 
-        const defs: ColDef[] = columns.map((column: any) => {
+        setRowData(processedData);
+        
+        // Define column definitions
+        const defs = columns.map((column: any) => {
           let cellDataType;
           switch (column.type) {
             case 'integer':
-              cellDataType = 'number';
+              cellDataType = 'integer';
               break;
             case 'float':
-              cellDataType = 'number';
+              cellDataType = 'float';
               break;
             case 'varchar':
-              cellDataType = 'text';
+              cellDataType = 'varchar';
               break;
             case 'boolean':
               cellDataType = 'boolean';
               break;
             default:
               cellDataType = 'text';
-          }
-
+          }        
+  
           return {
             headerName: column.name.charAt(0).toUpperCase() + column.name.slice(1),
             field: column.name,
             editable: true,
             filter: true,  
             hide: column.name === 'id',
-            cellDataType,  
+            cellDataType: cellDataType,
+            cellClassRules: {
+              'invalid-cell': (params: CellValueChangedEvent) => checkInvalidCell(params.value, column.type)
+            }
           };
         });
-
+  
+        // Append the custom "Validity" column
+        defs.push({
+          headerName: "Validity",
+          field: "isValid",
+          cellRenderer: (params: ICellRendererParams) => {
+            return <span>{params.data.isValid ? 'Valid' : 'Invalid'}</span>;
+          },
+          editable: false,
+          filter: true,
+          sortable: true
+        });
+  
+        // Append the custom "Remove" column
         defs.push({
           headerName: "Remove",
           field: "remove",
@@ -70,33 +131,48 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
           filter: false,
           sortable: false,
         });
-
+  
+        // Set the updated row data and column definitions
+        setRowData(processedData);
         setColumnDefs(defs);
         console.log("Set ColumnDefs:", defs);
       })
       .catch(error => console.error('Error:', error));
-  }, [tableName]);
+  }, [tableName]);  
 
   // Adds a new row to the grid with the current filters applied
   const handleAddRow = () => {
     const filterModel = gridApiRef.current?.getFilterModel();
     
     const newRow = columnDefs.reduce((acc, colDef) => {
-      if (colDef.field && colDef.field !== 'id') {
+      if (colDef.field && colDef.field !== 'id' && colDef.field !== 'isValid' && colDef.field !== 'remove') {
         if (filterModel && filterModel[colDef.field]) {
+          // Apply current filter as the default value for the new row
           acc[colDef.field] = filterModel[colDef.field].filter;
         } else {
-          acc[colDef.field] = colDef.cellDataType === 'boolean' ? false : (colDef.cellDataType === 'text' ? '' : null);
+          // Assign default values based on the data type
+          switch (colDef.cellDataType) {
+            case 'boolean':
+              acc[colDef.field] = false;
+              break;
+            case 'text':
+              acc[colDef.field] = '';
+              break;
+            default:
+              acc[colDef.field] = null; // Default null for other data types unless specified
+              break;
+          }
         }
       } else if (colDef.field === 'id') {
+        // Assign a temporary negative ID for new rows
         acc[colDef.field] = tempId.current--;
       }
       return acc;
-    }, {} as Record<string, any>);
+    }, { isValid: true } as Record<string, any>); // Set isValid to true by default
     
     setRowData(prev => [...prev, newRow]);
   };
-  
+
   // Removes a row from the grid and adds the id to removedRowIds
   const handleRemoveRow = (params: ICellRendererParams) => {
     const idToRemove = params.data.id;
@@ -153,31 +229,60 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     setChanges({});
     const refreshedResponse = await fetchData(tableName);
     const { data } = refreshedResponse;
-    setRowData(data); 
+    const updatedRowData = data.map((row: any) => ({
+      ...row,
+      isValid: checkRowValidity(row, columnDefs)
+    }));
+    setRowData(updatedRowData); 
   };  
 
   // Parses the uploaded XLSX file and updates the rowData if the format is valid
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
-  
+
     const { data, isValid } = await parseXLSX(file, columnDefs);
     if (isValid) {
-      console.log("Data:", data);
-      setRowData(data);
-      console.log("RowData:", rowData);
-      setIsFileUploaded(true); 
-      setRemovedRowIds([]); 
-      setChanges({}); 
+      console.log("Data from file:", data);
+
+      // Apply validity checks to each row based on the current column definitions
+      const validatedData = data.map(row => ({
+        ...row,
+        isValid: checkRowValidity(row, columnDefs)
+      }));
+
+      setRowData(validatedData); // Update the state with validated data
+      setIsFileUploaded(true);
+      setRemovedRowIds([]);
+      setChanges({});
+      console.log("Validated RowData:", validatedData);
     } else {
       alert('Invalid XLSX format for this table.');
       event.target.value = '';
-    }    
+    }
   };
   
   // Updates the changes object whenever a cell value is changed  
-  const onCellValueChanged = ({ data }: { data: any }) => {
-    setChanges((prev: typeof changes) => ({ ...prev, [data.id]: data }));
+  const onCellValueChanged = ({ data, colDef, rowIndex, columnApi, api }: CellValueChangedEvent) => {
+    const focusedCell = api.getFocusedCell(); // Get the currently focused cell
+
+    const updatedIsValid = checkRowValidity(data, columnDefs);
+    const updatedRowData = rowData.map(row => {
+        if (row.id === data.id) {
+            return { ...data, isValid: updatedIsValid };
+        }
+        return row;
+    });
+
+    setRowData(updatedRowData);
+    setChanges(prev => ({ ...prev, [data.id]: data }));
+
+    // Optionally, use a timeout to delay focusing until after the state update
+    setTimeout(() => {
+        if (focusedCell) {
+            api.setFocusedCell(focusedCell.rowIndex, focusedCell.column); // Restore focus
+        }
+    }, 0);
   };
 
   // Required to access the grid API for editing

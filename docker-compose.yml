@@ -6,7 +6,7 @@ services:
       - .:/app
 
   database:
-    image: postgres:latest
+    image: bitnami/postgresql:latest
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -14,7 +14,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
-      - postgres-data:/var/lib/postgresql/data  
+      - postgres-data:/bitnami/postgresql
       - ./database:/docker-entrypoint-initdb.d
     depends_on:
       - setup
