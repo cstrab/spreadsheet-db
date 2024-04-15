@@ -20,6 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# TODO: Change to .get() method and pass table_name as a query parameter
 @app.post("/read")
 def read_table(request: Read, db: Session = Depends(get_db)):
     table_name = request.table_name

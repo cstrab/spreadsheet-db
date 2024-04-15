@@ -175,6 +175,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         onGridReady={onGridReady} 
       />
       <input type="file" accept=".xlsx" onChange={handleFileUpload} />
+      {isFileUploaded && <button onClick={() => window.location.reload()}>Back</button>}
       <button onClick={handleUpdate}>Update</button>
       <button onClick={handleAddRow} disabled={isFileUploaded}>Add Row</button>
     </div>
