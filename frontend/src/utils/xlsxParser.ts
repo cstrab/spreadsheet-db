@@ -24,7 +24,14 @@ export const parseXLSX = async (file: File, columnDefs: ColDef[]): Promise<{data
       if (isValid) {
         const dataWithTempIds = rows.map((row, index) => {
           const rowObj = headers.reduce<Record<string, any>>((obj, header, i) => {
-            obj[header] = row[i] || ''; 
+            let cellValue = row[i] || '';
+            // Convert 'true' and 'false' strings to actual boolean values
+            if (cellValue === 'true') {
+              cellValue = true;
+            } else if (cellValue === 'false') {
+              cellValue = false;
+            }
+            obj[header] = cellValue;
             return obj;
           }, {});
 

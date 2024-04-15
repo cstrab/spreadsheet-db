@@ -26,21 +26,42 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     console.log("RowData after update:", rowData);
   }, [rowData]); 
   
-  // Fetches data from the backend and sets columnDefs whenever tableName changes
+ // Fetches data from the backend and sets columnDefs whenever tableName changes
   useEffect(() => {
     fetchData(tableName)
       .then(response => {
         const { columns, data } = response;
         setRowData(data);
-  
-        const defs: ColDef[] = columns.map((column: string) => ({
-          headerName: column.charAt(0).toUpperCase() + column.slice(1),
-          field: column,
-          editable: true,
-          filter: true,  
-          hide: column === 'id',
-        }));
-  
+
+        const defs: ColDef[] = columns.map((column: any) => {
+          let cellDataType;
+          switch (column.type) {
+            case 'integer':
+              cellDataType = 'number';
+              break;
+            case 'float':
+              cellDataType = 'number';
+              break;
+            case 'varchar':
+              cellDataType = 'text';
+              break;
+            case 'boolean':
+              cellDataType = 'boolean';
+              break;
+            default:
+              cellDataType = 'text';
+          }
+
+          return {
+            headerName: column.name.charAt(0).toUpperCase() + column.name.slice(1),
+            field: column.name,
+            editable: true,
+            filter: true,  
+            hide: column.name === 'id',
+            cellDataType,  
+          };
+        });
+
         defs.push({
           headerName: "Remove",
           field: "remove",
@@ -49,33 +70,32 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
           filter: false,
           sortable: false,
         });
-  
+
         setColumnDefs(defs);
         console.log("Set ColumnDefs:", defs);
       })
       .catch(error => console.error('Error:', error));
-  }, [tableName]);  
+  }, [tableName]);
 
   // Adds a new row to the grid with the current filters applied
   const handleAddRow = () => {
     const filterModel = gridApiRef.current?.getFilterModel();
-  
+    
     const newRow = columnDefs.reduce((acc, colDef) => {
       if (colDef.field && colDef.field !== 'id') {
         if (filterModel && filterModel[colDef.field]) {
           acc[colDef.field] = filterModel[colDef.field].filter;
         } else {
-          // Check if the column type is not a string, if so, set the initial value to null
-          acc[colDef.field] = colDef.type === 'boolean' ? false : (colDef.type === 'string' ? '' : null);
+          acc[colDef.field] = colDef.cellDataType === 'boolean' ? false : (colDef.cellDataType === 'text' ? '' : null);
         }
       } else if (colDef.field === 'id') {
         acc[colDef.field] = tempId.current--;
       }
       return acc;
     }, {} as Record<string, any>);
-  
+    
     setRowData(prev => [...prev, newRow]);
-  };  
+  };
   
   // Removes a row from the grid and adds the id to removedRowIds
   const handleRemoveRow = (params: ICellRendererParams) => {

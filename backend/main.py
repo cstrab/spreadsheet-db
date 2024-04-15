@@ -40,11 +40,11 @@ def read_table(request: Read, db: Session = Depends(get_db)):
     items = db.query(model).offset(skip).limit(limit).all()
     logger.info(f"Retrieved {len(items)} items from the database for table: {table_name}")
 
-    columns = model.__table__.columns.keys()
+    columns = [{"name": column.name, "type": str(column.type).lower()} for column in model.__table__.columns]
     result = [schema(**item.__dict__) for item in items]
 
     logger.info(f"Returning columns and data for table: {table_name}")
-    return {"columns": list(columns), "data": result}
+    return {"columns": columns, "data": result}
 
 @app.post("/update")
 async def update_table(request: Update, db: Session = Depends(get_db)):
