@@ -34,6 +34,14 @@ const checkInvalidCell = (value: any, type: string): boolean => {
       return typeof value !== 'string';
     case 'boolean':
       return typeof value !== 'boolean' && value !== 'true' && value !== 'false';
+    case 'date':
+      // Check if the date string is in 'YYYY-MM-DD' format
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      return !dateRegex.test(value);
+    case 'datetime':
+      // Check if the datetime string is in 'YYYY-MM-DDTHH:MM:SS' format
+      const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+      return !datetimeRegex.test(value);
     default:
       return false;
   }
@@ -124,6 +132,12 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
               break;
             case 'boolean':
               cellDataType = 'boolean';
+              break;
+            case 'date':
+              cellDataType = 'dateString';
+              break;
+            case 'datetime':
+              cellDataType = 'text';
               break;
             default:
               cellDataType = 'text';
