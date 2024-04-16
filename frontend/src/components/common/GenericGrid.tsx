@@ -9,6 +9,7 @@ import '../../styles/styles.css'
 
 interface ExtendedColDef extends ColDef {
   cellDataType?: 'number' | 'text' | 'boolean'; 
+  cellDataTypeAPI?: string;
 }
 
 // Custom cell renderer for the remove button column
@@ -18,13 +19,19 @@ const RemoveButtonRenderer = (props: ICellRendererParams) => {
 
 // Ensure `checkInvalidCell` function handles string type correctly
 const checkInvalidCell = (value: any, type: string): boolean => {
+  console.log(`Checking value: ${value}, Type: ${type}`); 
+  if (value === null) {
+    // Assuming null is allowed initially for any type
+    return false;
+  }
+
   switch (type) {
     case 'integer':
-      return value !== null && (!Number.isInteger(parseFloat(value)));
+      return !Number.isInteger(Number(value));
     case 'float':
-      return value !== null && (isNaN(value) || !value.toString().includes('.'));
+      return isNaN(Number(value));
     case 'varchar':
-      return value !== null && value !== '' && typeof value !== 'string';
+      return typeof value !== 'string';
     case 'boolean':
       return typeof value !== 'boolean' && value !== 'true' && value !== 'false';
     default:
@@ -33,19 +40,44 @@ const checkInvalidCell = (value: any, type: string): boolean => {
 };
 
 const checkRowValidity = (row: any, columns: ExtendedColDef[]): boolean => {
-  return columns.every(column => {
-    if (column.field === 'isValid' || column.field === 'remove') {
+  console.log(`Checking validity for row:`, row);  // Log the entire row being processed
+  const invalidReasons: any = [];  // Store reasons for any invalid fields
+  console.log("Columns:", columns)
+
+  const isValidRow = columns.every(column => {
+    // Ensure column.field is defined to satisfy TypeScript's index type requirement
+    if (typeof column.field === 'undefined') {
+      console.log("Column field is undefined, skipping this column.");
+      return true;  // Skip this iteration as we can't check a column without a field name
+    }
+
+    // Check and log control fields (usually these fields don't need validation)
+    if (column.field === 'id' || column.field === 'isValid' || column.field === 'remove') {
+      console.log(`Skipping validation for control field: ${column.field}`);
       return true; // Skip checking our control fields
     }
 
-    // Ensure that `column.field` and `column.cellDataType` are defined before using them
-    if (column.field && column.cellDataType) {
-      // Safely access `row[column.field]` and pass `column.cellDataType` as a string
-      return !checkInvalidCell(row[column.field], column.cellDataType);
+    // Handle column.type for both string and string[] scenarios
+    const columnType = column.cellDataTypeAPI;
+    if (columnType) {
+      const isValid = !checkInvalidCell(row[column.field], columnType);
+      if (!isValid) {
+        invalidReasons.push(`Field '${column.field}' with value '${row[column.field]}' is invalid for type '${columnType}'.`);
+      }
+      return isValid;
+    } else {
+      invalidReasons.push(`Field '${column.field}' is missing a type definition.`);
+      return false;
     }
-
-    return false; // Return false or handle differently if field or cellDataType is undefined
   });
+
+  if (!isValidRow) {
+    console.log(`Row is invalid. Reasons:`, invalidReasons);
+  } else {
+    console.log(`Row is valid.`);
+  }
+
+  return isValidRow;
 };
 
 // Generic grid component that displays data from the backend
@@ -82,13 +114,13 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
           let cellDataType;
           switch (column.type) {
             case 'integer':
-              cellDataType = 'integer';
+              cellDataType = 'number';
               break;
             case 'float':
-              cellDataType = 'float';
+              cellDataType = 'number';
               break;
             case 'varchar':
-              cellDataType = 'varchar';
+              cellDataType = 'text';
               break;
             case 'boolean':
               cellDataType = 'boolean';
@@ -104,6 +136,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
             filter: true,  
             hide: column.name === 'id',
             cellDataType: cellDataType,
+            cellDataTypeAPI: column.type,
             cellClassRules: {
               'invalid-cell': (params: CellValueChangedEvent) => checkInvalidCell(params.value, column.type)
             }
@@ -156,7 +189,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
               acc[colDef.field] = false;
               break;
             case 'text':
-              acc[colDef.field] = '';
+              acc[colDef.field] = null;
               break;
             default:
               acc[colDef.field] = null; // Default null for other data types unless specified
