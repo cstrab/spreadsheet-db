@@ -40,6 +40,34 @@ class TableThree(Base):
     date_column = Column(Date, index=True)
     datetime_column = Column(DateTime, index=True)
 
+class BinMaster(Base):
+    __tablename__ = 'bin_master'
+    __table_args__ = {'schema': 'test_schema'}
+    id = Column(Integer, primary_key=True, index=True)
+    storage_type = Column(String, index=True)
+    storage_bin = Column(String, index=True)
+    phase_number = Column(String, index=True)
+    phase_name = Column(String, index=True)
+    bin_class = Column(String, index=True)
+    bin_feature = Column(String, index=True)
+    reservoir_qty_kg = Column(Float, index=True)
+    primary_pouring_point = Column(String, index=True)
+    secondary_pouring_point = Column(String, index=True)
+    filling_point = Column(String, index=True)
+    if_in_manual = Column(String, index=True)
+    if_in_cdl = Column(String, index=True)
+    cdl_drop_number = Column(String, index=True)
+    if_in_cluster = Column(String, index=True)
+    cluster_drop_number = Column(String, index=True)
+    if_in_bulk = Column(String, index=True)
+    bulk_drop_number = Column(String, index=True)
+    if_in_kardex = Column(String, index=True)
+    if_in_hcsd = Column(String, index=True)
+    hcsd_drop_number = Column(String, index=True)
+    if_in_sds = Column(String, index=True)
+    sds_drop_number = Column(String, index=True)
+    comment = Column(String, index=True)
+
 DATABASE_URL = f"{DATABASE_TYPE}://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
 engine = create_engine(DATABASE_URL)

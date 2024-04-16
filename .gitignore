@@ -26,3 +26,7 @@ yarn-error.log*
 # python cache files
 __pycache__/
 *.py[cod]
+
+# bulk update tests
+bin_master.xlsx
+material_master.xlsx

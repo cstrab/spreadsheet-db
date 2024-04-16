@@ -66,11 +66,69 @@ class TableThreeRead(TableThreeBase):
 class TableThreeListUpdate(BaseModel):
     data: List[TableThreeUpdate]
 
+# Schemas for BinMaster
+class BinMasterBase(BaseModel):
+    storage_type: Optional[str]
+    storage_bin: Optional[str]
+    phase_number: Optional[str]
+    phase_name: Optional[str]
+    bin_class: Optional[str]
+    bin_feature: Optional[str]
+    reservoir_qty_kg: Optional[float]
+    primary_pouring_point: Optional[str]
+    secondary_pouring_point: Optional[str]
+    filling_point: Optional[str]
+    if_in_manual: Optional[str]
+    if_in_cdl: Optional[str]
+    cdl_drop_number: Optional[str]
+    if_in_cluster: Optional[str]
+    cluster_drop_number: Optional[str]
+    if_in_bulk: Optional[str]
+    bulk_drop_number: Optional[str]
+    if_in_kardex: Optional[str]
+    if_in_hcsd: Optional[str]
+    hcsd_drop_number: Optional[str]
+    if_in_sds: Optional[str]
+    sds_drop_number: Optional[str]
+    comment: Optional[str]
+
+class BinMasterUpdate(BaseModel):
+    id: Optional[int] = None
+    storage_type: Optional[str] = None
+    storage_bin: Optional[str] = None
+    phase_number: Optional[str] = None
+    phase_name: Optional[str] = None
+    bin_class: Optional[str] = None
+    bin_feature: Optional[str] = None
+    reservoir_qty_kg: Optional[float] = None
+    primary_pouring_point: Optional[str] = None
+    secondary_pouring_point: Optional[str] = None
+    filling_point: Optional[str] = None
+    if_in_manual: Optional[str] = None
+    if_in_cdl: Optional[str] = None
+    cdl_drop_number: Optional[str] = None
+    if_in_cluster: Optional[str] = None
+    cluster_drop_number: Optional[str] = None
+    if_in_bulk: Optional[str] = None
+    bulk_drop_number: Optional[str] = None
+    if_in_kardex: Optional[str] = None
+    if_in_hcsd: Optional[str] = None
+    hcsd_drop_number: Optional[str] = None
+    if_in_sds: Optional[str] = None
+    sds_drop_number: Optional[str] = None
+    comment: Optional[str] = None
+
+class BinMasterRead(BinMasterBase):
+    id: int
+
+class BinMasterListUpdate(BaseModel):
+    data: List[BinMasterUpdate]
+
 # Schema for read operations
 class Read(BaseModel):
     table_name: str
     skip: int = 0
-    limit: int = 100
+    limit: int = 10000
 
 # Function to validate update data based on table_name
 def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[BaseModel]]) -> Any:
@@ -92,6 +150,7 @@ class BulkUpdate(BaseModel):
         TableOneListUpdate,
         TableTwoListUpdate,
         TableThreeListUpdate,
+        BinMasterListUpdate,
     ]
 
     @validator('updates', pre=True)
@@ -102,6 +161,7 @@ class BulkUpdate(BaseModel):
             'table_one': TableOneListUpdate,
             'table_two': TableTwoListUpdate,
             'table_three': TableThreeListUpdate,
+            'bin_master': BinMasterListUpdate,
         })
 
 # Schema for update operations

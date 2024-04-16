@@ -1,10 +1,11 @@
 from typing import Dict, Type, Any
 
-from models.models import Base, TableOne, TableTwo, TableThree
+from models.models import Base, TableOne, TableTwo, TableThree, BinMaster
 from models.schemas import (
     TableOneRead, TableOneUpdate, TableOneListUpdate, 
     TableTwoRead, TableTwoUpdate, TableTwoListUpdate, 
     TableThreeRead, TableThreeUpdate, TableThreeListUpdate, 
+    BinMasterRead, BinMasterUpdate, BinMasterListUpdate, 
 )
 
 
@@ -12,6 +13,7 @@ TABLE_MODEL_MAPPING: Dict[str, Type[Base]] = {
     "table_one": TableOne,
     "table_two": TableTwo,
     "table_three": TableThree,
+    "bin_master": BinMaster,
 }
 
 TABLE_SCHEMA_MAPPING: Dict[str, Dict[str, Any]] = {
@@ -29,5 +31,10 @@ TABLE_SCHEMA_MAPPING: Dict[str, Dict[str, Any]] = {
         "read": TableThreeRead,
         "update": TableThreeUpdate,
         "list_update": TableThreeListUpdate,
+    },
+    "bin_master": {
+        "read": BinMasterRead,
+        "update": BinMasterUpdate,
+        "list_update": BinMasterListUpdate,
     },
 }

@@ -338,7 +338,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   };
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 500 }}>
+    <div className="ag-theme-quartz" style={{ height: 800 }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}

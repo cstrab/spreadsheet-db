@@ -71,6 +71,107 @@
                     "data_type": "datetime"
                 }
             ]
+        },
+        {
+            "table_name": "bin_master",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int_id"
+                },
+                {
+                    "column_name": "storage_type",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "storage_bin",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "phase_number",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "phase_name",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "bin_class",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "bin_feature",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "reservoir_qty_kg",
+                    "data_type": "float"
+                },
+                {
+                    "column_name": "primary_pouring_point",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "secondary_pouring_point",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "filling_point",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_manual",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_cdl",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "cdl_drop_number",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_cluster",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "cluster_drop_number",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_bulk",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "bulk_drop_number",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_kardex",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_hcsd",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "hcsd_drop_number",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "if_in_sds",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "sds_drop_number",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "comment",
+                    "data_type": "str"
+                }
+            ]
         }
     ]
 }
