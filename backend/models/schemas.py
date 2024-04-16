@@ -1,4 +1,5 @@
 from typing import List, Optional, Union, Any, Dict, Type
+from datetime import date, datetime
 
 from pydantic import BaseModel, validator, ValidationError
 
@@ -47,6 +48,8 @@ class TableThreeBase(BaseModel):
     int_column: Optional[int]
     float_column: Optional[float]
     bool_column: Optional[bool]
+    date_column: Optional[date]
+    datetime_column: Optional[datetime]
 
 class TableThreeUpdate(BaseModel):
     id: Optional[int] = None
@@ -54,6 +57,8 @@ class TableThreeUpdate(BaseModel):
     int_column: Optional[int] = None
     float_column: Optional[float] = None
     bool_column: Optional[bool] = None
+    date_column: Optional[date] = None
+    datetime_column: Optional[datetime] = None
 
 class TableThreeRead(TableThreeBase):
     id: int

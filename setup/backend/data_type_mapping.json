@@ -3,5 +3,7 @@
     "int": "Integer",
     "float": "Float",
     "str": "String",
-    "bool": "Boolean"
+    "bool": "Boolean",
+    "date": "Date",
+    "datetime": "DateTime"
 }

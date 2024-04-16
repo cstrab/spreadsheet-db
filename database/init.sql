@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS test_schema.table_three (
     string_column VARCHAR(255),
     int_column INTEGER,
     float_column DOUBLE PRECISION,
-    bool_column BOOLEAN
+    bool_column BOOLEAN,
+    date_column DATE,
+    datetime_column TIMESTAMP
 );
 

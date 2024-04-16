@@ -17,6 +17,7 @@ output_file=$2
 
 # Start the Python file
 echo "from typing import List, Optional, Union, Any, Dict, Type" > $output_file
+echo "from datetime import date, datetime" >> $output_file
 echo "" >> $output_file
 echo "from pydantic import BaseModel, validator, ValidationError" >> $output_file
 echo "" >> $output_file

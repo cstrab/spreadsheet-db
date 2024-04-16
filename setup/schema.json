@@ -61,6 +61,14 @@
                 {
                     "column_name": "bool_column",
                     "data_type": "bool"
+                },
+                {
+                    "column_name": "date_column",
+                    "data_type": "date"
+                },
+                {
+                    "column_name": "datetime_column",
+                    "data_type": "datetime"
                 }
             ]
         }
