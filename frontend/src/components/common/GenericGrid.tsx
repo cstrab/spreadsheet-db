@@ -232,12 +232,6 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
           await bulkUpdateData(tableName, rowData);
           alert('Bulk update successful!');
           setIsFileUploaded(false); 
-          
-          // Clear the file input
-          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-          if (fileInput) {
-            fileInput.value = '';
-          }
 
         } catch (error) {
           console.error('Failed bulk update:', error);
@@ -258,6 +252,12 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         alert('Failed to update. Please try again.');
       }
     }
+    // Clear the file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
     // Refetch the data here to ensure the grid reflects the backend state
     setChanges({});
     const refreshedResponse = await fetchData(tableName);

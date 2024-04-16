@@ -7,6 +7,7 @@ from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
 from utils.database import get_db
 from utils.logger import setup_logger
 
+# TODO: Review with Larry, consider using DAO for database operations each table
 
 logger = setup_logger('backend')
 
