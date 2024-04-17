@@ -38,11 +38,11 @@ def read_table(request: Read, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Table not found")
     
     logger.info(f"Querying database for table: {table_name}")
-    items = db.query(model).offset(skip).limit(limit).all()
-    logger.info(f"Retrieved {len(items)} items from the database for table: {table_name}")
+    query = db.query(model).offset(skip).limit(limit)
+    items = (schema(**item.__dict__) for item in query) 
 
     columns = [{"name": column.name, "type": str(column.type).lower()} for column in model.__table__.columns]
-    result = [schema(**item.__dict__) for item in items]
+    result = list(items)  
 
     logger.info(f"Returning columns and data for table: {table_name}")
     return {"columns": columns, "data": result}

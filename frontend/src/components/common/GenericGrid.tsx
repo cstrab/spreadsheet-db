@@ -19,9 +19,7 @@ const RemoveButtonRenderer = (props: ICellRendererParams) => {
 
 // Ensure `checkInvalidCell` function handles string type correctly
 const checkInvalidCell = (value: any, type: string): boolean => {
-  console.log(`Checking value: ${value}, Type: ${type}`); 
   if (value === null) {
-    // Assuming null is allowed initially for any type
     return false;
   }
 
@@ -48,44 +46,26 @@ const checkInvalidCell = (value: any, type: string): boolean => {
 };
 
 const checkRowValidity = (row: any, columns: ExtendedColDef[]): boolean => {
-  console.log(`Checking validity for row:`, row);  // Log the entire row being processed
-  const invalidReasons: any = [];  // Store reasons for any invalid fields
-  console.log("Columns:", columns)
-
-  const isValidRow = columns.every(column => {
-    // Ensure column.field is defined to satisfy TypeScript's index type requirement
+  return columns.every(column => {
     if (typeof column.field === 'undefined') {
-      console.log("Column field is undefined, skipping this column.");
-      return true;  // Skip this iteration as we can't check a column without a field name
+      // Skip this iteration as we can't check a column without a field name
+      return true;
     }
 
-    // Check and log control fields (usually these fields don't need validation)
     if (column.field === 'id' || column.field === 'isValid' || column.field === 'remove') {
-      console.log(`Skipping validation for control field: ${column.field}`);
-      return true; // Skip checking our control fields
+      // Skip checking control fields
+      return true;
     }
 
-    // Handle column.type for both string and string[] scenarios
     const columnType = column.cellDataTypeAPI;
     if (columnType) {
-      const isValid = !checkInvalidCell(row[column.field], columnType);
-      if (!isValid) {
-        invalidReasons.push(`Field '${column.field}' with value '${row[column.field]}' is invalid for type '${columnType}'.`);
-      }
-      return isValid;
+      // Directly return the validity of the field
+      return !checkInvalidCell(row[column.field], columnType);
     } else {
-      invalidReasons.push(`Field '${column.field}' is missing a type definition.`);
+      // If there is no type defined for the field, consider the row invalid
       return false;
     }
   });
-
-  if (!isValidRow) {
-    console.log(`Row is invalid. Reasons:`, invalidReasons);
-  } else {
-    console.log(`Row is valid.`);
-  }
-
-  return isValidRow;
 };
 
 // Generic grid component that displays data from the backend
@@ -274,6 +254,8 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
 
     // Refetch the data here to ensure the grid reflects the backend state
     setChanges({});
+
+    // TODO: Consider removing this part, may not be necessary
     const refreshedResponse = await fetchData(tableName);
     const { data } = refreshedResponse;
     const updatedRowData = data.map((row: any) => ({
@@ -288,9 +270,19 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
 
+    // Temp logging
+    const startTimeParse = performance.now(); 
+
     const { data, isValid } = await parseXLSX(file, columnDefs);
+
+    // Temp logging
+    const endTimeParse = performance.now(); 
+    console.log(`Time taken to parse the data: ${endTimeParse - startTimeParse} milliseconds`); 
+
     if (isValid) {
-      console.log("Data from file:", data);
+
+      // Temp logging
+      const startTimeValidation = performance.now(); 
 
       // Apply validity checks to each row based on the current column definitions
       const validatedData = data.map(row => ({
@@ -298,11 +290,22 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
         isValid: checkRowValidity(row, columnDefs)
       }));
 
+      // Temp logging
+      const endTimeValidation = performance.now();
+      console.log(`Time taken to validate the data: ${endTimeValidation - startTimeValidation} milliseconds`);
+
+      // Temp logging
+      const startTimeUpdate = performance.now();
+
       setRowData(validatedData); // Update the state with validated data
       setIsFileUploaded(true);
       setRemovedRowIds([]);
       setChanges({});
-      console.log("Validated RowData:", validatedData);
+
+      // Temp logging
+      const endTimeUpdate = performance.now();
+      console.log(`Time taken to update the data: ${endTimeUpdate - startTimeUpdate} milliseconds`);
+      
     } else {
       alert('Invalid XLSX format for this table.');
       event.target.value = '';

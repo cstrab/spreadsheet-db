@@ -13,6 +13,7 @@ const App: React.FC = () => {
         <Route path="/table-two" element={<TablePage tableName="table_two" />} />
         <Route path="/table-three" element={<TablePage tableName="table_three" />} />
         <Route path="/bin-master" element={<TablePage tableName="bin_master" />} />
+        <Route path="/material-master" element={<TablePage tableName="material_master" />} />
       </Routes>
     </Router>
   );

@@ -172,6 +172,123 @@
                     "data_type": "str"
                 }
             ]
+        },
+        {
+            "table_name": "material_master",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int_id"
+                },
+                {
+                    "column_name": "plant",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "material",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "description",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "flashpoint",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "is_automation_possible",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "low_flashpoint",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "crystal",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "crystalizes",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "citrus",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "refrigerate",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "nitrogen",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "heated",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "difficult_heat",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "mix_well",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "viscous",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "slightly_viscous",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "solid",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "solidifies",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "separates",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "stench",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "moss_oleo_resins",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "wax",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "special_handling",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "plastic_storage",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "supply_issue",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "phantom",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "additional_comments",
+                    "data_type": "str"
+                }
+            ]
         }
     ]
 }

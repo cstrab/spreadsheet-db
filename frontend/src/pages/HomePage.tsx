@@ -19,6 +19,9 @@ export const HomePage: React.FC = () => {
           <li>
             <Link to="/bin-master">Bin Master</Link>
           </li>
+          <li>
+            <Link to="/material-master">Material Master</Link>
+          </li>
         </ul>
       </nav>
     </div>
