@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm import Session
 
 from models.schemas import Read, Update, BulkUpdate
 from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
@@ -8,6 +9,7 @@ from utils.database import get_db
 from utils.logger import setup_logger
 
 # TODO: Review with Larry, consider using DAO for database operations each table
+# TODO: Add UpdateReponse and BulkUpdateResponse models
 
 logger = setup_logger('backend')
 
@@ -103,6 +105,51 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     logger.info(f"Committing changes to the database")
     return {"message": "Update successful"}
 
+# @app.post("/update")
+# async def update_table(request: Update, db: Session = Depends(get_db)):
+#     table_name = request.table_name
+#     updates = request.updates
+#     removed_row_ids = request.removed_row_ids
+
+#     logger.info(f"Executing /update endpoint for table: {table_name}")
+
+#     if table_name in TABLE_MODEL_MAPPING and table_name in TABLE_SCHEMA_MAPPING:
+#         model = TABLE_MODEL_MAPPING[table_name]
+#         schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
+#     else:
+#         logger.error(f"Table not found in mappings: {table_name}")
+#         raise HTTPException(status_code=404, detail="Table not found")
+
+#     # Deleting rows from the table
+#     db.query(model).filter(model.id.in_(removed_row_ids)).delete(synchronize_session=False)
+
+#     updated_items = []
+
+#     # Handling updated and new rows for the table
+#     for update_instance in updates:
+#         update_dict = update_instance.dict(exclude_unset=True)
+#         item_id = update_dict.pop("id", None)
+
+#         if item_id is not None and item_id >= 0:
+#             db_item = db.query(model).filter(model.id == item_id).first()
+#             if not db_item:
+#                 logger.error(f"Item with id {item_id} not found")
+#                 raise HTTPException(status_code=404, detail=f"Item with id {item_id} not found")
+#             for key, value in update_dict.items():
+#                 setattr(db_item, key, value)
+#         else:
+#             db_item = model(**update_dict)
+#             db.add(db_item)
+
+#         db.flush()  # This will fetch the new id if it's a new record
+#         updated_items.append(db_item)
+
+#     db.commit()
+
+#     # Sending back updated items
+#     updated_items_data = [jsonable_encoder(item) for item in updated_items]
+#     return {"message": "Update successful", "data": updated_items_data}
+
 @app.post("/bulk-update")
 async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
     table_name = request.table_name
@@ -133,3 +180,38 @@ async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to update data")
 
     return {"message": "Bulk update successful"}
+
+# @app.post("/bulk-update")
+# async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
+#     table_name = request.table_name
+#     updates = request.updates.data
+
+#     logger.info(f"Executing /bulk-update endpoint for table: {table_name}")
+
+#     if table_name not in TABLE_MODEL_MAPPING:
+#         logger.error(f"Table not found in mappings: {table_name}")
+#         raise HTTPException(status_code=404, detail="Table not found")
+
+#     model = TABLE_MODEL_MAPPING[table_name]
+
+#     try:
+#         logger.info(f"Clearing all entries from table: {table_name}")
+#         db.query(model).delete()
+
+#         new_items = []
+#         for update_instance in updates:
+#             update_dict = update_instance.dict(exclude={'id'})  # exclude 'id' if you do not want to carry over client-side IDs
+#             db_item = model(**update_dict)
+#             db.add(db_item)
+#             new_items.append(db_item)
+
+#         db.commit()
+
+#         # Fetching new IDs and any other changes from the database
+#         new_items_data = [item.__dict__ for item in new_items]
+#         return {"message": "Bulk update successful", "data": new_items_data}
+
+#     except Exception as e:
+#         db.rollback()
+#         logger.error(f"Failed to update table {table_name}: {e}")
+#         raise HTTPException(status_code=500, detail=f"Failed to update data")

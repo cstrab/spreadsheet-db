@@ -1,24 +1,27 @@
 import axios from 'axios';
+import { ReadResponse, UpdateDataPayload, BulkUpdateDataPayload } from '../interfaces/apiInterfaces';
 
-const API_HOST = process.env.REACT_APP_API_HOST || 'localhost';
-const API_PORT = process.env.REACT_APP_API_PORT || '8000';
+const api = axios.create({
+  baseURL: `http://${process.env.REACT_APP_API_HOST || 'localhost'}:${process.env.REACT_APP_API_PORT || '8000'}`,
+});
 
-export const fetchData = async (tableName: string, setLoading: (isLoading: boolean) => void) => {
+export const fetchData = async (tableName: string, setLoading: (isLoading: boolean) => void): Promise<ReadResponse> => {
   setLoading(true);
   try {
-    const response = await axios.post(`http://${API_HOST}:${API_PORT}/read`, { table_name: tableName });
+    const response = await api.post('/read', { table_name: tableName });
     return {
       data: response.data.data,
       columns: response.data.columns
     };
   } catch (error) {
+    console.error('Failed to fetch data:', error);
     throw error;
   } finally {
     setLoading(false);
   }
 };
 
-export const updateData = async (tableName: string, data: any[], removedRowIds: string[], setLoading: (isLoading: boolean) => void) => {
+export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<void> => {
   setLoading(true);
   const payload = {
     table_name: tableName,
@@ -26,23 +29,25 @@ export const updateData = async (tableName: string, data: any[], removedRowIds: 
     removed_row_ids: removedRowIds
   };
   try {
-    await axios.post(`http://${API_HOST}:${API_PORT}/update`, payload);
+    await api.post('/update', payload);
   } catch (error) {
+    console.error('Failed to update data:', error);
     throw error;
   } finally {
     setLoading(false);
   }
 };
 
-export const bulkUpdateData = async (tableName: string, data: any[], setLoading: (isLoading: boolean) => void) => {
+export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<void> => {
   setLoading(true);
   const payload = {
     table_name: tableName,
     updates: { data }
   };
   try {
-    await axios.post(`http://${API_HOST}:${API_PORT}/bulk-update`, payload);
+    await api.post('/bulk-update', payload);
   } catch (error) {
+    console.error('Failed to perform bulk update:', error);
     throw error;
   } finally {
     setLoading(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import GenericGrid from '../components/common/GenericGrid';
+import GenericGrid from '../components/main/GenericGrid';
 
 interface TablePageProps {
   tableName: string;
