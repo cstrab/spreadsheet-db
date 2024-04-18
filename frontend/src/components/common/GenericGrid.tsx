@@ -75,6 +75,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   const [changes, setChanges] = useState({});
   const [removedRowIds, setRemovedRowIds] = useState<string[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const gridApiRef = useRef<GridApi | null>(null);
   const tempId = useRef(-1);  
 
@@ -85,7 +86,7 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   
   // Fetches data from the backend and sets columnDefs whenever tableName changes
   useEffect(() => {
-    fetchData(tableName)
+    fetchData(tableName, setIsLoading)
       .then(response => {
         const { columns, data } = response;
   
@@ -170,35 +171,42 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   // Adds a new row to the grid with the current filters applied
   const handleAddRow = () => {
     const filterModel = gridApiRef.current?.getFilterModel();
-    
-    const newRow = columnDefs.reduce((acc, colDef) => {
-      if (colDef.field && colDef.field !== 'id' && colDef.field !== 'isValid' && colDef.field !== 'remove') {
-        if (filterModel && filterModel[colDef.field]) {
-          // Apply current filter as the default value for the new row
-          acc[colDef.field] = filterModel[colDef.field].filter;
-        } else {
-          // Assign default values based on the data type
-          switch (colDef.cellDataType) {
-            case 'boolean':
-              acc[colDef.field] = false;
-              break;
-            case 'text':
-              acc[colDef.field] = null;
-              break;
-            default:
-              acc[colDef.field] = null; // Default null for other data types unless specified
-              break;
-          }
+
+    // Generate a unique temporary ID for the new row by decrementing tempId
+    const newId = --tempId.current;
+
+    console.log("Assigning new ID:", newId)
+
+    const newRow = columnDefs.reduce<Record<string, any>>((acc, colDef) => {
+        const field = colDef.field;
+        if (field && field !== 'id' && field !== 'isValid' && field !== 'remove') {
+            if (filterModel && filterModel[field]) {
+                // Apply current filter as the default value for the new row
+                acc[field] = filterModel[field].filter;
+            } else {
+                // Assign default values based on the data type
+                switch (colDef.cellDataType) {
+                    case 'boolean':
+                        acc[field] = false;
+                        break;
+                    case 'text':
+                        acc[field] = null;
+                        break;
+                    default:
+                        acc[field] = null; // Default null for other data types unless specified
+                        break;
+                }
+            }
+        } else if (field === 'id') {
+            // Assign a unique temporary negative ID for new rows
+            acc[field] = newId;
         }
-      } else if (colDef.field === 'id') {
-        // Assign a temporary negative ID for new rows
-        acc[colDef.field] = tempId.current--;
-      }
-      return acc;
-    }, { isValid: true } as Record<string, any>); // Set isValid to true by default
-    
+        return acc;
+    }, { isValid: true, id: newId }); // Set isValid to true by default and initialize with the unique ID
+
     setRowData(prev => [...prev, newRow]);
-  };
+    console.log("RowData after update Add Row:", rowData);  
+};
 
   // Removes a row from the grid and adds the id to removedRowIds
   const handleRemoveRow = (params: ICellRendererParams) => {
@@ -217,98 +225,106 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
   };
 
   // Updates the data in the backend with the changes and provides removedRowIds for deletion
-  const handleUpdate = async () => {
-    if (isFileUploaded) {
-      // If a file has been uploaded, use the bulk-update endpoint
+// Updates the data in the backend with the changes and provides removedRowIds for deletion
+const handleUpdate = async () => {
+  let updateFailed = false;
+
+  if (isFileUploaded) {
       if (window.confirm("Are you sure you want to perform bulk update? This will clear and replace the database")) {
-        try {
-          // Since we're doing a bulk update, we use the entire rowData
-          await bulkUpdateData(tableName, rowData);
-          alert('Bulk update successful!');
-          setIsFileUploaded(false); 
-
-        } catch (error) {
-          console.error('Failed bulk update:', error);
-          alert('Failed to bulk update. Please try again.');
-        }
+          try {
+              await bulkUpdateData(tableName, rowData, setIsLoading);
+              alert('Bulk update successful!');
+              setIsFileUploaded(false); // Ensure this is reset after successful update
+          } catch (error) {
+              console.error('Failed bulk update:', error);
+              alert('Failed to bulk update. Please try again.');
+              updateFailed = true;
+          }
       }
-    } else {
-      // If no file has been uploaded use update endpoint
-      const updatedData = Object.values(changes); 
+  } else {
+      const updatedData = Object.values(changes);
       try {
-        await updateData(tableName, updatedData, removedRowIds); 
-        alert('Update successful!');
-        setRemovedRowIds([]); 
-        setChanges({}); 
-
+          await updateData(tableName, updatedData, removedRowIds, setIsLoading);
+          alert('Update successful!');
+          setRemovedRowIds([]);
       } catch (error) {
-        console.error('Failed to update:', error);
-        alert('Failed to update. Please try again.');
+          console.error('Failed to update:', error);
+          alert('Failed to update. Please try again.');
+          updateFailed = true;
       }
-    }
-    // Clear the file input
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    if (fileInput) {
+  }
+
+  setChanges({});  // Reset changes regardless of the update success
+
+  // Clear the file input
+  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+  if (fileInput) {
       fileInput.value = '';
-    }
+  }
 
-    // Refetch the data here to ensure the grid reflects the backend state
-    setChanges({});
-
-    // TODO: Consider removing this part, may not be necessary
-    const refreshedResponse = await fetchData(tableName);
-    const { data } = refreshedResponse;
-    const updatedRowData = data.map((row: any) => ({
-      ...row,
-      isValid: checkRowValidity(row, columnDefs)
-    }));
-    setRowData(updatedRowData); 
-  };  
+  // Only refetch the data if the update failed
+  if (updateFailed) {
+      setIsFileUploaded(false); // Ensure to reset file upload state on failure too
+      try {
+          const refreshedResponse = await fetchData(tableName, setIsLoading);
+          const { data } = refreshedResponse;
+          const updatedRowData = data.map((row: any) => ({
+              ...row,
+              isValid: checkRowValidity(row, columnDefs)
+          }));
+          setRowData(updatedRowData);
+      } catch (error) {
+          console.error('Failed to fetch data:', error);
+      }
+  } else {
+      setIsFileUploaded(false); // Ensure this is reset on success too if not already handled
+  }
+};
 
   // Parses the uploaded XLSX file and updates the rowData if the format is valid
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
 
-    // Temp logging
-    const startTimeParse = performance.now(); 
+    setIsLoading(true); // Set loading to true when file parsing starts
 
-    const { data, isValid } = await parseXLSX(file, columnDefs);
+    try {
+      // Temp logging
+      const startTimeParse = performance.now(); 
 
-    // Temp logging
-    const endTimeParse = performance.now(); 
-    console.log(`Time taken to parse the data: ${endTimeParse - startTimeParse} milliseconds`); 
-
-    if (isValid) {
+      const { data, isValid } = await parseXLSX(file, columnDefs);
 
       // Temp logging
-      const startTimeValidation = performance.now(); 
+      const endTimeParse = performance.now(); 
+      console.log(`Time taken to parse the data: ${endTimeParse - startTimeParse} milliseconds`); 
 
-      // Apply validity checks to each row based on the current column definitions
-      const validatedData = data.map(row => ({
-        ...row,
-        isValid: checkRowValidity(row, columnDefs)
-      }));
+      if (isValid) {
+        // Temp logging
+        const startTimeValidation = performance.now(); 
 
-      // Temp logging
-      const endTimeValidation = performance.now();
-      console.log(`Time taken to validate the data: ${endTimeValidation - startTimeValidation} milliseconds`);
+        // Apply validity checks to each row based on the current column definitions
+        const validatedData = data.map(row => ({
+          ...row,
+          isValid: checkRowValidity(row, columnDefs)
+        }));
 
-      // Temp logging
-      const startTimeUpdate = performance.now();
+        // Temp logging
+        const endTimeValidation = performance.now();
+        console.log(`Time taken to validate the data: ${endTimeValidation - startTimeValidation} milliseconds`);
 
-      setRowData(validatedData); // Update the state with validated data
-      setIsFileUploaded(true);
-      setRemovedRowIds([]);
-      setChanges({});
-
-      // Temp logging
-      const endTimeUpdate = performance.now();
-      console.log(`Time taken to update the data: ${endTimeUpdate - startTimeUpdate} milliseconds`);
-      
-    } else {
-      alert('Invalid XLSX format for this table.');
-      event.target.value = '';
+        setRowData(validatedData); // Update the state with validated data
+        setIsFileUploaded(true);
+        setRemovedRowIds([]);
+        setChanges({});
+      } else {
+        alert('Invalid XLSX format for this table.');
+        event.target.value = ''; // Clear the input value
+      }
+    } catch (error) {
+      console.error('Error during file upload:', error);
+      alert('Failed to process the file. Please try again.');
+    } finally {
+      setIsLoading(false); // Reset loading state whether the file processing succeeds or fails
     }
   };
   
@@ -340,8 +356,20 @@ const GenericGrid = ({ tableName }: { tableName: string }) => {
     gridApiRef.current = params.api;
   };
 
+  const renderLoadingOverlay = () => {
+    if (isLoading) {
+      return (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="ag-theme-quartz" style={{ height: 800 }}>
+      {renderLoadingOverlay()}
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
