@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ReadResponse, UpdateDataPayload, BulkUpdateDataPayload } from '../interfaces/apiInterfaces';
+import { ReadResponse, UpdateResponse, UpdateDataPayload, BulkUpdateDataPayload } from '../interfaces/apiInterfaces';
 
 const api = axios.create({
   baseURL: `http://${process.env.REACT_APP_API_HOST || 'localhost'}:${process.env.REACT_APP_API_PORT || '8000'}`,
@@ -21,7 +21,7 @@ export const fetchData = async (tableName: string, setLoading: (isLoading: boole
   }
 };
 
-export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<void> => {
+export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<UpdateResponse> => {
   setLoading(true);
   const payload = {
     table_name: tableName,
@@ -29,7 +29,8 @@ export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataP
     removed_row_ids: removedRowIds
   };
   try {
-    await api.post('/update', payload);
+    const response = await api.post('/update', payload);
+    return response.data;
   } catch (error) {
     console.error('Failed to update data:', error);
     throw error;
@@ -38,14 +39,15 @@ export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataP
   }
 };
 
-export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<void> => {
+export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<UpdateResponse> => {
   setLoading(true);
   const payload = {
     table_name: tableName,
     updates: { data }
   };
   try {
-    await api.post('/bulk-update', payload);
+    const response = await api.post('/bulk-update', payload);
+    return response.data; 
   } catch (error) {
     console.error('Failed to perform bulk update:', error);
     throw error;

@@ -4,13 +4,9 @@ export interface ReadResponse {
     columns: any[];
   }
   
-// export interface UpdateDataResponse {
-//     data: any[];
-//   }
-  
-// export interface BulkUpdateDataResponse {
-//     data: any[];
-//   }
+export interface UpdateResponse {
+    updated_ids: { tempId: number; dbId: number }[];
+  }
 
 export interface UpdateDataPayload {
     tableName: string;

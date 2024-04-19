@@ -33,7 +33,7 @@ const useGrid = (tableName: string) => {
           field: column.name,
           editable: true,
           filter: true,
-          hide: column.name === 'id',
+          // hide: column.name === 'id',
           cellDataType: ['integer', 'float'].includes(column.type) ? 'number' :
                         ['varchar'].includes(column.type) ? 'text' :
                         ['boolean'].includes(column.type) ? 'boolean' :
@@ -112,33 +112,70 @@ const useGrid = (tableName: string) => {
   };
 
   const handleUpdate = async () => {
+    console.log("Starting update process..."); // Log when the update process starts
     setIsLoading(true);
     let updateFailed = false;
     try {
       if (isFileUploaded) {
+        console.log("Performing bulk update..."); // Log when starting a bulk update
         const confirmation = window.confirm("Are you sure you want to perform a bulk update? This will clear and replace the database.");
         if (confirmation) {
-          await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
+          const updateResult = await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
+          console.log("Bulk update result:", updateResult); // Log the result of the bulk update call
+          const idMap = updateResult.updated_ids;
+          if (!idMap) {
+            throw new Error("No ID mapping returned from bulk update.");
+          }
+          const newRowsData = rowData.map(row => {
+            const update = idMap.find(map => map.tempId === row.id);
+            return update ? { ...row, id: update.dbId } : row;
+          });
+          setRowData(newRowsData.map(row => ({
+            ...row,
+            isValid: checkRowValidity(row, columnDefs)
+          })));
           alert('Bulk update successful!');
           setIsFileUploaded(false);
           setRemovedRowIds([]);
           setChanges({});
         }
       } else {
-        await updateData({ tableName, data: Object.values(changes), removedRowIds}, setIsLoading);
+        console.log("Performing regular update..."); // Log when starting a regular update
+        const updatePayload = { tableName, data: Object.values(changes), removedRowIds };
+        const updateResult = await updateData(updatePayload, setIsLoading);
+        console.log("Regular update result:", updateResult); // Log the result of the regular update call
+        const idMap = updateResult.updated_ids;
+        if (!idMap) {
+            throw new Error("No ID mapping returned from update.");
+        }
+        const newRowsData = rowData.map(row => {
+          if (row.id < 0) {
+            const update = idMap.find(map => map.tempId === row.id);
+            return update ? { ...row, id: update.dbId } : row;
+          }
+          return row;
+        });
+        setRowData(newRowsData.map(row => ({
+          ...row,
+          isValid: checkRowValidity(row, columnDefs)
+        })));
         alert('Update successful!');
         setRemovedRowIds([]);
         setChanges({});
       }
     } catch (error) {
-      console.error('Failed to update:', error);
+      console.error('Failed to update:', error); // Detailed error logging
       alert('Failed to update. Please try again.');
       updateFailed = true;
+      setRemovedRowIds([]);
+      setChanges({});
     } finally {
       setIsLoading(false);
       if (updateFailed) {
+        console.log("Update failed, refetching data..."); // Log when starting to refetch data due to failure
         fetchData(tableName, setIsLoading)
           .then(response => {
+            console.log("Refetch success:", response); // Log successful data refetch
             const updatedData = response.data.map(row => ({
               ...row,
               isValid: checkRowValidity(row, response.columns)
@@ -146,11 +183,11 @@ const useGrid = (tableName: string) => {
             setRowData(updatedData);
           })
           .catch(error => {
-            console.error('Error refetching data:', error);
+            console.error('Error refetching data:', error); // Log errors during refetch
           });
       }
     }
-  };  
+  };
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
