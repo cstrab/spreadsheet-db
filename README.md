@@ -2,12 +2,13 @@
 
 An application that simulates an excel-like grid capable of displaying contents of multiple relational database tables and allowing users to edit/update
 
+![Example](setup/sample_data/sample.gif)
 
 Stack:
 - Frontend: React.js
     - Noteable packages: AG Grid
 - Backend: Python
-    - Noteable packages: FastAPI, SQLAlchemy
+    - Noteable packages: FastAPI, SQLAlchemy, Pydantic
 - Database: PostresSQL or MSSQL
 
 
@@ -169,7 +170,7 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
 
 ## Phase 2:
 
-Goal: Code refactoring and small optimizations
+Goal: Code refactoring and optimizations
 
 
 Stage: Refactoring - Breaking changes are expected, but less frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Internal code review is required at the end of this stage.
