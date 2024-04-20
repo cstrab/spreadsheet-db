@@ -1,0 +1,38 @@
+{
+    "schema_name": "sample_schema",
+    "tables": [
+        {
+            "table_name": "sample_table",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int_id"
+                },
+                {
+                    "column_name": "string_column",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "int_column",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "float_column",
+                    "data_type": "float"
+                },
+                {
+                    "column_name": "bool_column",
+                    "data_type": "bool"
+                },
+                {
+                    "column_name": "date_column",
+                    "data_type": "date"
+                },
+                {
+                    "column_name": "datetime_column",
+                    "data_type": "datetime"
+                }
+            ]
+        }
+    ]
+}

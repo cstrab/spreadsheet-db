@@ -1,0 +1,20 @@
+{
+    "postgresql": {
+        "int_id": "SERIAL PRIMARY KEY",
+        "int": "INTEGER",
+        "float": "DOUBLE PRECISION",
+        "str": "VARCHAR(255)",
+        "bool": "BOOLEAN",
+        "date": "DATE",
+        "datetime": "TIMESTAMP"
+    },
+    "mssql": {
+        "int_id": "INT IDENTITY(1,1) PRIMARY KEY",
+        "int": "INT",
+        "float": "FLOAT",
+        "str": "NVARCHAR(255)",
+        "bool": "BIT",
+        "date": "DATE",
+        "datetime": "DATETIME"
+    }
+}
