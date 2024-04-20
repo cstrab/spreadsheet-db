@@ -123,6 +123,9 @@ Optional:
 docker compose down -v
 ```
 
+Sample Data:
+- Sample data is provided in the spreadsheet-db/setup/data folder
+    - Note: Data must be in .xlsx format and headers must match what is defined in the schema.json file
 
 
 # Roadmap
@@ -155,12 +158,12 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
 - [x] Deployment: No requirements
 
 - [x] Evaluation of POC:
-    Current Limitations:
-    - Large data tables may experience slow bulk update and read times 
-        - Tested with 150k row data, xlsx import / UI render (3s), update (negligible), bulk update (60s), read (10s)
-    - Works only for a single schema that will contain all tables
-    - Only PostgresSQL database type has been tested
-    - Dockerfiles and docker-compose.yml are not automated by Makefile setup
+    - Current Limitations:
+        - Large data tables may experience slow bulk update and read times 
+            - Tested with 150k row data, xlsx import / UI render (3s), update (negligible), bulk update (60s), read (10s)
+        - Works only for a single schema that will contain all tables
+        - Only PostgresSQL database type has been tested
+        - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
 
 
@@ -191,13 +194,13 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
     - [ ] Update .sh files to incorporate any Frontend/Backend changes, may need to put the ID reset as part of shell script by
 passing the database type and then using the correct query statement in dao.py
 - [ ] Local Testing:
-    - [ ] Fix docker-compose.yml file so that database service starts up after setup service exits, may require custom startup script for database
+    - [ ] Combine local testing steps to a single docker-compose file, must allow for time for setup to run before starting the app
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
 
 
 - [ ] Internal Code Review: 
-    Current Limitations/Feedback:
+    - Current Limitations/Feedback:
 
 
 
@@ -219,7 +222,7 @@ Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this 
 
 
 - [ ] Evaluation of MVP:
-    Current Limitations/Feedback:
+    - Current Limitations/Feedback:
 
 
 
@@ -241,7 +244,7 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
 
 
 - [ ] Evaluation of Version 1.0:
-    Bugs:
+    - Bugs:
 
 
 
