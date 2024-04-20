@@ -8,19 +8,7 @@ export const HomePage: React.FC = () => {
       <nav>
         <ul>
           <li>
-            <Link to="/table-one">Table One</Link>
-          </li>
-          <li>
-            <Link to="/table-two">Table Two</Link>
-          </li>
-          <li>
-            <Link to="/table-three">Table Three</Link>
-          </li>
-          <li>
-            <Link to="/bin-master">Bin Master</Link>
-          </li>
-          <li>
-            <Link to="/material-master">Material Master</Link>
+            <Link to="/sample-table">Sample Table</Link>
           </li>
         </ul>
       </nav>

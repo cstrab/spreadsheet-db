@@ -1,6 +1,7 @@
 # spreadsheet-db
 
-Description: Application that simulates an excel-like grid displaying contents of multiple relational database tables allowing users to edit/update
+An application that simulates an excel-like grid capable of displaying contents of multiple relational database tables and allowing users to edit/update
+
 
 Stack:
 - Frontend: React.js
@@ -9,12 +10,15 @@ Stack:
     - Noteable packages: FastAPI, SQLAlchemy
 - Database: PostresSQL or MSSQL
 
+
 CI/CD:
 - Github Actions or Gitlab CI
 - ArgoCD
 
+
 Deployment:
 - Kubernetes
+
 
 
 # Local Deployment
@@ -22,11 +26,15 @@ Deployment:
 Requirements: 
 - Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
 
+
 Step 1:
-- Update spreadsheet-db/setup/schema.json file with your desired table structure
+- Update spreadsheet-db/setup/schema.json file with desired table structure
+    - Note: Must have "id" column with data_type "int_id" for each table
     - Note: Currently only supports single schema
-    - Note: Fields 'schema_name' and 'column_name' must use '_' for spacing if required
+    - Note: Fields 'schema_name' and 'column_name' must use '_' if spacing is required
     - Note: Current 'data_type' options: 'int_id', 'int', 'float', 'str', 'bool', 'date', 'datetime'
+    - Note: Keep all naming conventions lowercase as seen in example
+
 
 Example: 
 ```
@@ -75,15 +83,45 @@ Example:
 }
 ```
     
+
 Step 2:
-- Startup
+- cd into spreadsheet-db/setup folder and run the following command:
+    - Note: This will build all Frontend, Backend, and Database files based off of the schema.json input
+    - Note: Do not proceed to Step 3: until container creates and exits successfully
+
 
 ```
-docker-compose up -d
+docker compose build --no-cache
 ```
+
+```
+docker compose up -d
+```
+
 
 Step 3: 
+- cd into spreadsheet-db root directory and run the following commands:
+
+```
+docker compose build --no-cache
+```
+
+```
+docker compose up -d
+```
+
+
+Step 4: 
 - Navigate to [localhost:3000](http://localhost:3000)
+
+
+Optional:
+- To stop and clear database volume for the application run the following in the spreadsheet-db root directory:
+
+```
+docker compose down -v
+```
+
 
 
 # Roadmap
@@ -91,7 +129,9 @@ Step 3:
 
 Goal: Basic functionality
 
+
 Stage: POC (Proof of Concept) - The app will be considered POC after this phase. Breaking changes are expected and more frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements.
+
 
 - [x] Frontend:
     - [x] Common component for displaying/editing database tables utilizing backend endpoints in excel-like grid format
@@ -122,11 +162,14 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
     - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
 
+
 ## Phase 2:
 
 Goal: Code refactoring and small optimizations
 
+
 Stage: Refactoring - Breaking changes are expected, but less frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Internal code review is required at the end of this stage.
+
 
 - [ ] Frontend:
     - [ ] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
@@ -151,15 +194,19 @@ passing the database type and then using the correct query statement in dao.py
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
 
+
 - [ ] Internal Code Review: 
     Current Limitations/Feedback:
+
 
 
 ## Phase 3: 
 
 Goal: Deployment and UAT (User Acceptance Testing) in DEV environment
 
+
 Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this phase. Breaking changes are expected and more frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Deployment to DEV environment and feedback collection is required.
+
 
 - [ ] Frontend:
 - [ ] Backend:
@@ -169,15 +216,19 @@ Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this 
 - [ ] CI/CD: 
 - [ ] Deployment:
 
+
 - [ ] Evaluation of MVP:
     Current Limitations/Feedback:
+
 
 
 ## Phase 4: 
 
 Goal: Initial release in PROD environment
 
+
 Stage: Version 1.0 Release - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but will be flagged as bugs to resolve if occured. Unit test coverage is required (80%) for Frontend and Backend. Deployment to PROD environment is required.
+
 
 - [ ] Frontend:
 - [ ] Backend:
@@ -187,8 +238,10 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
 - [ ] CI/CD: 
 - [ ] Deployment:
 
+
 - [ ] Evaluation of Version 1.0:
     Bugs:
+
 
 
 ## Backlog: 

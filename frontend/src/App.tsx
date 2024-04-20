@@ -9,11 +9,7 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/table-one" element={<TablePage tableName="table_one" />} />
-        <Route path="/table-two" element={<TablePage tableName="table_two" />} />
-        <Route path="/table-three" element={<TablePage tableName="table_three" />} />
-        <Route path="/bin-master" element={<TablePage tableName="bin_master" />} />
-        <Route path="/material-master" element={<TablePage tableName="material_master" />} />
+        <Route path="/sample-table" element={<TablePage tableName="sample_table" />} />
       </Routes>
     </Router>
   );

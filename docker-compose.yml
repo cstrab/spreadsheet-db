@@ -1,9 +1,5 @@
 version: '3.8'
 services:
-  # setup:
-  #   build: ./setup
-  #   volumes:
-  #     - .:/app
 
   database:
     image: bitnami/postgresql:latest
@@ -16,8 +12,6 @@ services:
     volumes:
       - postgres-data:/bitnami/postgresql
       - ./database:/docker-entrypoint-initdb.d
-    # depends_on:
-    #   - setup
 
   backend:
     build: ./backend
@@ -35,24 +29,23 @@ services:
     depends_on:
       - database
 
-  # frontend:
-  #     build: 
-  #       context: ./frontend
-  #       args: 
-  #         - REACT_APP_API_HOST=${REACT_APP_API_HOST}
-  #         - REACT_APP_API_PORT=${REACT_APP_API_PORT}
-  #     env_file:
-  #     - .env
-  #     ports:
-  #       - "${REACT_APP_PORT}:${REACT_APP_NGINX_PORT}"
-  #     volumes:
-  #       - ./frontend:/app
-  #     environment:
-  #       REACT_APP_API_HOST: ${REACT_APP_API_HOST}
-  #       REACT_APP_API_PORT: ${REACT_APP_API_PORT}
-  #     depends_on:
-  #       - backend
-  #       - setup
+  frontend:
+      build: 
+        context: ./frontend
+        args: 
+          - REACT_APP_API_HOST=${REACT_APP_API_HOST}
+          - REACT_APP_API_PORT=${REACT_APP_API_PORT}
+      env_file:
+      - .env
+      ports:
+        - "${REACT_APP_PORT}:${REACT_APP_NGINX_PORT}"
+      volumes:
+        - ./frontend:/app
+      environment:
+        REACT_APP_API_HOST: ${REACT_APP_API_HOST}
+        REACT_APP_API_PORT: ${REACT_APP_API_PORT}
+      depends_on:
+        - backend
 
 volumes:
   postgres-data:

@@ -33,7 +33,7 @@ const useGrid = (tableName: string) => {
           field: column.name,
           editable: true,
           filter: true,
-          // hide: column.name === 'id',
+          hide: column.name === 'id',
           cellDataType: ['integer', 'float'].includes(column.type) ? 'number' :
                         ['varchar'].includes(column.type) ? 'text' :
                         ['boolean'].includes(column.type) ? 'boolean' :
