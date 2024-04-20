@@ -10,6 +10,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/sample-table" element={<TablePage tableName="sample_table" />} />
+        <Route path="/material-master" element={<TablePage tableName="material_master" />} />
       </Routes>
     </Router>
   );

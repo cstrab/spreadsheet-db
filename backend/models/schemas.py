@@ -32,6 +32,72 @@ class SampleTableRead(SampleTableBase):
 class SampleTableListUpdate(BaseModel):
     data: List[SampleTableUpdate]
 
+# Schemas for MaterialMaster
+class MaterialMasterBase(BaseModel):
+    plant: Optional[str]
+    material: Optional[str]
+    description: Optional[str]
+    flashpoint: Optional[int]
+    is_automation_possible: Optional[str]
+    low_flashpoint: Optional[str]
+    crystal: Optional[str]
+    crystalizes: Optional[str]
+    citrus: Optional[str]
+    refrigerate: Optional[str]
+    nitrogen: Optional[str]
+    heated: Optional[str]
+    difficult_heat: Optional[str]
+    mix_well: Optional[str]
+    viscous: Optional[str]
+    slightly_viscous: Optional[str]
+    solid: Optional[str]
+    solidifies: Optional[str]
+    separates: Optional[str]
+    stench: Optional[str]
+    moss_oleo_resins: Optional[str]
+    wax: Optional[str]
+    special_handling: Optional[str]
+    plastic_storage: Optional[str]
+    supply_issue: Optional[str]
+    phantom: Optional[str]
+    additional_comments: Optional[str]
+
+class MaterialMasterUpdate(BaseModel):
+    id: Optional[int] = None
+    plant: Optional[str] = None
+    material: Optional[str] = None
+    description: Optional[str] = None
+    flashpoint: Optional[int] = None
+    is_automation_possible: Optional[str] = None
+    low_flashpoint: Optional[str] = None
+    crystal: Optional[str] = None
+    crystalizes: Optional[str] = None
+    citrus: Optional[str] = None
+    refrigerate: Optional[str] = None
+    nitrogen: Optional[str] = None
+    heated: Optional[str] = None
+    difficult_heat: Optional[str] = None
+    mix_well: Optional[str] = None
+    viscous: Optional[str] = None
+    slightly_viscous: Optional[str] = None
+    solid: Optional[str] = None
+    solidifies: Optional[str] = None
+    separates: Optional[str] = None
+    stench: Optional[str] = None
+    moss_oleo_resins: Optional[str] = None
+    wax: Optional[str] = None
+    special_handling: Optional[str] = None
+    plastic_storage: Optional[str] = None
+    supply_issue: Optional[str] = None
+    phantom: Optional[str] = None
+    additional_comments: Optional[str] = None
+
+class MaterialMasterRead(MaterialMasterBase):
+    id: int
+
+class MaterialMasterListUpdate(BaseModel):
+    data: List[MaterialMasterUpdate]
+
 # Schema for read operations
 class Read(BaseModel):
     table_name: str
@@ -56,6 +122,7 @@ class BulkUpdate(BaseModel):
     table_name: str
     updates: Union[
         SampleTableListUpdate,
+        MaterialMasterListUpdate,
     ]
 
     @validator('updates', pre=True)
@@ -64,6 +131,7 @@ class BulkUpdate(BaseModel):
         logger.info(f"Validating bulk updates for table: {table_name}")
         return validate_update_data(v, table_name, {
             'sample_table': SampleTableListUpdate,
+            'material_master': MaterialMasterListUpdate,
         })
 
 # Schema for update operations

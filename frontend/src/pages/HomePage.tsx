@@ -10,6 +10,9 @@ export const HomePage: React.FC = () => {
           <li>
             <Link to="/sample-table">Sample Table</Link>
           </li>
+          <li>
+            <Link to="/material-master">Material Master</Link>
+          </li>
         </ul>
       </nav>
     </div>
