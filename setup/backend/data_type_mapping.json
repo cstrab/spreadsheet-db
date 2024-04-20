@@ -1,0 +1,9 @@
+{
+    "int_id": "Integer",
+    "int": "Integer",
+    "float": "Float",
+    "str": "String",
+    "bool": "Boolean",
+    "date": "Date",
+    "datetime": "DateTime"
+}
