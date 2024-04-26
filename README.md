@@ -1,6 +1,6 @@
 # spreadsheet-db
 
-An application that simulates an excel-like grid capable of displaying contents of multiple relational database tables and allowing users to edit/update
+An application allowing users to perform CRUD (Create, Read, Update, and Delete) operations on relational database tables through an excel-like user interface
 
 ![Example](setup/sample_data/sample.gif)
 
@@ -20,6 +20,10 @@ CI/CD:
 Deployment:
 - Kubernetes
 
+
+# High-level Architecture
+
+![Architecture Diagram](setup/sample_data/architecture-diagram.pdf)
 
 
 # Local Deployment
@@ -157,6 +161,7 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
     - [x] Setup docker-compose for local testing
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
+- [x] General: No requirements
 
 - [x] Evaluation of POC:
     - Current Limitations:
@@ -198,7 +203,8 @@ passing the database type and then using the correct query statement in dao.py
     - [ ] Combine local testing steps to a single docker-compose file, must allow for time for setup to run before starting the app
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
-
+- [ ] General: 
+    - [ ] High-level architecture diagram
 
 - [ ] Internal Code Review: 
     - Current Limitations/Feedback:
@@ -220,6 +226,7 @@ Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this 
 - [ ] Local Testing:
 - [ ] CI/CD: 
 - [ ] Deployment:
+- [ ] General:
 
 
 - [ ] Evaluation of MVP:
@@ -242,6 +249,7 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
 - [ ] Local Testing:
 - [ ] CI/CD: 
 - [ ] Deployment:
+- [ ] General:
 
 
 - [ ] Evaluation of Version 1.0:
@@ -264,3 +272,4 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
 - [ ] Local Testing:
 - [ ] CI/CD: 
 - [ ] Deployment:
+- [ ] General:
