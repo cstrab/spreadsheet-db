@@ -181,13 +181,12 @@ Goal: Code refactoring and optimizations
 Stage: Refactoring - Breaking changes are expected, but less frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Internal code review is required at the end of this stage.
 
 
-- [ ] Frontend:
+- [x] Frontend:
     - [x] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
     - [x] General - Add navigation bar with custom asset symbol and version number
     - [x] General - Incorporate links into navigation bar, main side link "Tables" with dropdown for table list
-    - [ ] useGrid.ts - Light cleanup of UI and styling
-    - [ ] useGrid.ts - Update alert statements to modals 
-    - [ ] General - Additional error handling and logging
+    - [x] useGrid.ts - Light cleanup of UI and styling
+    - [x] General - Display count of row entries under the AGGrid component
 - [ ] Backend:
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
     - [ ] dao.py - Implement custom DAO for each data table 
@@ -196,7 +195,6 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
     - [ ] main.py - Fix bug where if in middle of /bulk-update or /read and exit page request continues
-    - [ ] General - Additional error handling and logging
 - [x] Database: No Requirements
 - [ ] Setup:
     - [ ] Update .sh files to incorporate any Frontend/Backend changes, may need to put the ID reset as part of shell script by
@@ -267,9 +265,12 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] useGrid.ts - Consider further refactor of rowHandling functions and possible define cell type mapping in a separate file
+    - [ ] useGrid.ts - Update alert statements to modals 
     - [ ] General - Use theme config
+    - [ ] General - Additional error handling and logging
 - [ ] Backend:
     - [ ] main.py - Troubleshoot why from_orm sqlalchemy does not work
+    - [ ] General - Additional error handling and logging
     - [ ] dao.py - Implement table read-only table query for Snowflake data extraction
 - [ ] Database:
 - [ ] Setup:
