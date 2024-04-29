@@ -1,20 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Card, CardContent, Typography } from '@mui/material';
 
 export const HomePage: React.FC = () => {
   return (
     <div>
-      <h1>Home Page</h1>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/sample-table">Sample Table</Link>
-          </li>
-          <li>
-            <Link to="/material-master">Material Master</Link>
-          </li>
-        </ul>
-      </nav>
+      <Card variant="outlined" style={{ maxWidth: 400, margin: 'auto' , marginTop: '40px'}}>
+        <CardContent>
+          <Typography variant="h5" component="h2" marginBottom={'20px'}>
+            Welcome to spreadsheet-db
+          </Typography>
+          <Typography color="textSecondary">
+            This is an application allowing users to perform CRUD (Create, Read, Update, and Delete) operations on relational database tables through an excel-like user interface.
+          </Typography>
+        </CardContent>
+      </Card>
     </div>
   );
 };

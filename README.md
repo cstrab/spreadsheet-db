@@ -184,7 +184,8 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
 - [ ] Frontend:
     - [x] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
     - [x] General - Add navigation bar with custom asset symbol and version number
-    - [ ] General - Incorporate links into navigation bar, main side link "Tables" with dropdown for table list
+    - [x] General - Incorporate links into navigation bar, main side link "Tables" with dropdown for table list
+    - [ ] useGrid.ts - Light cleanup of UI and styling
     - [ ] useGrid.ts - Update alert statements to modals 
     - [ ] General - Additional error handling and logging
 - [ ] Backend:
@@ -194,6 +195,7 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
+    - [ ] main.py - Fix bug where if in middle of /bulk-update or /read and exit page request continues
     - [ ] General - Additional error handling and logging
 - [x] Database: No Requirements
 - [ ] Setup:

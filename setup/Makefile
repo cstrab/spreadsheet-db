@@ -30,9 +30,9 @@ BE_SCHEMAS_OUTPUT = ../backend/models/schemas.py
 FE_APP_SCRIPT = ./frontend/create_App.tsx.sh
 FE_APP_OUTPUT = ../frontend/src/App.tsx
 
-# HomePage.tsx
-FE_HOME_SCRIPT = ./frontend/create_HomePage.tsx.sh
-FE_HOME_OUTPUT = ../frontend/src/pages/HomePage.tsx
+# Header.tsx
+FE_HEADER_SCRIPT = ./frontend/create_Header.tsx.sh
+FE_HEADER_OUTPUT = ../frontend/src/components/common/Header.tsx
 
 .PHONY: all database backend frontend clean
 
@@ -57,5 +57,5 @@ backend:
 frontend:
 	@chmod +x $(FE_APP_SCRIPT)
 	@./$(FE_APP_SCRIPT) $(SCHEMA) $(FE_APP_OUTPUT)
-	@chmod +x $(FE_HOME_SCRIPT)
-	@./$(FE_HOME_SCRIPT) $(SCHEMA) $(FE_HOME_OUTPUT)
+	@chmod +x $(FE_HEADER_SCRIPT)
+	@./$(FE_HEADER_SCRIPT) $(SCHEMA) $(FE_HEADER_OUTPUT)
