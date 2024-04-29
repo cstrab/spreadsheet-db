@@ -23,7 +23,7 @@ Deployment:
 
 # High-level Architecture
 
-![Architecture Diagram](setup/sample_data/architecture-diagram.pdf)
+![Architecture Diagram](setup/sample_data/architecture-diagram.png)
 
 
 # Local Deployment
@@ -269,6 +269,7 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
     - [ ] dao.py - Implement table read-only table query for Snowflake data extraction
 - [ ] Database:
 - [ ] Setup:
+    - [ ] General - Consider replacing .sh scripts with python scripts
 - [ ] Local Testing:
 - [ ] CI/CD: 
 - [ ] Deployment:
