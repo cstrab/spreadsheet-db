@@ -108,7 +108,7 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
 
     return {"message": "Update successful", "updated_ids": updated_ids}
 
-@app.post("/bulk-update")
+@app.put("/bulk-update")
 async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
     table_name = request.table_name
     updates = request.updates.data

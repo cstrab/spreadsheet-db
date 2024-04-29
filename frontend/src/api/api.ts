@@ -46,7 +46,7 @@ export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload,
     updates: { data }
   };
   try {
-    const response = await api.post('/bulk-update', payload);
+    const response = await api.put('/bulk-update', payload);
     return response.data; 
   } catch (error) {
     console.error('Failed to perform bulk update:', error);

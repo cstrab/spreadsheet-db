@@ -190,7 +190,7 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
     - [ ] dao.py - Implement custom DAO for each data table 
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
-    - [ ] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
+    - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
     - [ ] main.py - Use json_serializer for improved performance
@@ -270,6 +270,7 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
 - [ ] Database:
 - [ ] Setup:
     - [ ] General - Consider replacing .sh scripts with python scripts
+    - [ ] General - Allow for multiple schemas
 - [ ] Local Testing:
 - [ ] CI/CD: 
 - [ ] Deployment:
