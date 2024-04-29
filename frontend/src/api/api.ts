@@ -29,7 +29,7 @@ export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataP
     removed_row_ids: removedRowIds
   };
   try {
-    const response = await api.post('/update', payload);
+    const response = await api.patch('/update', payload);
     return response.data;
   } catch (error) {
     console.error('Failed to update data:', error);

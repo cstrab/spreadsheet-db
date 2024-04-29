@@ -55,7 +55,7 @@ def read_table(
     logger.info(f"Returning columns and data for table: {table_name}")
     return {"columns": columns, "data": result}
 
-@app.post("/update")
+@app.patch("/update")
 async def update_table(request: Update, db: Session = Depends(get_db)):
     table_name = request.table_name
     updates = request.updates
