@@ -182,7 +182,7 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
 
 
 - [ ] Frontend:
-    - [ ] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
+    - [x] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
     - [ ] General - Additional error handling and logging
     - [ ] General - Add navigation bar with custom asset symbol and version number
     - [ ] useGrid.ts - Update alert statements to modals
@@ -203,8 +203,8 @@ passing the database type and then using the correct query statement in dao.py
     - [ ] Combine local testing steps to a single docker-compose file, must allow for time for setup to run before starting the app
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
-- [ ] General: 
-    - [ ] High-level architecture diagram
+- [x] General: 
+    - [x] High-level architecture diagram
 
 - [ ] Internal Code Review: 
     - Current Limitations/Feedback:

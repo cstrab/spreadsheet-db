@@ -12,11 +12,13 @@ DATABASE_NAME = os.getenv('POSTGRES_DB')
 DATABASE_HOST = os.getenv('POSTGRES_HOST')
 DATABASE_PORT = os.getenv('POSTGRES_PORT')
 
+SCHEMA_NAME = 'sample_schema'
+
 Base = declarative_base()
 
 class SampleTable(Base):
     __tablename__ = 'sample_table'
-    __table_args__ = {'schema': 'sample_schema'}
+    __table_args__ = {'schema': SCHEMA_NAME}
     id = Column(Integer, primary_key=True, index=True)
     string_column = Column(String, index=True)
     int_column = Column(Integer, index=True)
@@ -27,7 +29,7 @@ class SampleTable(Base):
 
 class MaterialMaster(Base):
     __tablename__ = 'material_master'
-    __table_args__ = {'schema': 'sample_schema'}
+    __table_args__ = {'schema': SCHEMA_NAME}
     id = Column(Integer, primary_key=True, index=True)
     plant = Column(String, index=True)
     material = Column(String, index=True)

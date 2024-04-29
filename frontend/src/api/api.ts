@@ -39,7 +39,7 @@ export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataP
   }
 };
 
-export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<UpdateResponse> => {
+export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload, setLoading: (isLoading: boolean) => void): Promise<void> => {
   setLoading(true);
   const payload = {
     table_name: tableName,

@@ -33,7 +33,7 @@ const useGrid = (tableName: string) => {
           field: column.name,
           editable: true,
           filter: true,
-          hide: column.name === 'id',
+          // hide: column.name === 'id',
           cellDataType: ['integer', 'float'].includes(column.type) ? 'number' :
                         ['varchar'].includes(column.type) ? 'text' :
                         ['boolean'].includes(column.type) ? 'boolean' :
@@ -118,23 +118,19 @@ const useGrid = (tableName: string) => {
       if (isFileUploaded) {
         const confirmation = window.confirm("Are you sure you want to perform a bulk update? This will clear and replace the database.");
         if (confirmation) {
-          const updateResult = await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
-          const idMap = updateResult.updated_ids;
-          if (!idMap) {
-            throw new Error("No ID mapping returned from bulk update.");
-          }
-          const newRowsData = rowData.map(row => {
-            const update = idMap.find(map => map.tempId === row.id);
-            return update ? { ...row, id: update.dbId } : row;
-          });
-          setRowData(newRowsData.map(row => ({
-            ...row,
-            isValid: checkRowValidity(row, columnDefs)
-          })));
-          alert('Bulk update successful!');
-          setIsFileUploaded(false);
-          setRemovedRowIds([]);
-          setChanges({});
+            await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
+            const newRowsData = rowData.map(row => ({
+                ...row,
+                id: -row.id 
+            }));
+            setRowData(newRowsData.map(row => ({
+                ...row,
+                isValid: checkRowValidity(row, columnDefs)
+            })));
+            alert('Bulk update successful!');
+            setIsFileUploaded(false);
+            setRemovedRowIds([]);
+            setChanges({});
         }
       } else {
         const updatePayload = { tableName, data: Object.values(changes), removedRowIds };

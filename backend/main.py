@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-# from sqlalchemy import text
+from sqlalchemy import text
 
 from models.schemas import Read, Update, BulkUpdate
 from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
+from models.models import SCHEMA_NAME
 from utils.database import get_db
 from utils.logger import setup_logger
 
@@ -105,44 +106,6 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
 
     return {"message": "Update successful", "updated_ids": updated_ids}
 
-# @app.post("/bulk-update")
-# async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
-#     table_name = request.table_name
-#     updates = request.updates.data
-
-#     logger.info(f"Executing /bulk-update endpoint for table: {table_name}")
-
-#     if table_name not in TABLE_MODEL_MAPPING:
-#         logger.error(f"Table not found in mappings: {table_name}")
-#         raise HTTPException(status_code=404, detail="Table not found")
-
-#     model = TABLE_MODEL_MAPPING[table_name]
-
-#     try:
-#         logger.info(f"Clearing all entries from table: {table_name}")
-#         db.query(model).delete()
-
-#         # TODO: Method for resetting the ID 
-#         # PostgreSQL-specific sequence reset
-#         sequence_name = f"test_schema.{table_name}_id_seq"  # Adjust based on your naming conventions
-#         db.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
-#         # MSSQL-specific identity reset
-#         db.execute(text(f"DBCC CHECKIDENT ('{table_name}', RESEED, 0)"))
-
-#         for update_instance in updates:
-#             update_dict = update_instance.dict(exclude={'id'}) 
-#             db_item = model(**update_dict)
-#             db.add(db_item)
-
-#         db.commit()
-#         logger.info(f"Successfully updated table {table_name} with new data")
-#     except Exception as e:
-#         db.rollback()
-#         logger.error(f"Failed to update table {table_name}: {e}")
-#         raise HTTPException(status_code=500, detail="Failed to update data")
-
-#     return {"message": "Bulk update successful"}
-
 @app.post("/bulk-update")
 async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
     table_name = request.table_name
@@ -155,21 +118,23 @@ async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Table not found")
 
     model = TABLE_MODEL_MAPPING[table_name]
-    updated_ids = []
 
     try:
         logger.info(f"Clearing all entries from table: {table_name}")
         db.query(model).delete()
 
+        # TODO: Move this to a separate file since it depends on the database type
+        # PostgreSQL-specific sequence reset
+        sequence_name = f"{SCHEMA_NAME}.{table_name}_id_seq"
+        db.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
+
+        # # MSSQL-specific identity reset
+        # db.execute(text(f"DBCC CHECKIDENT ('{table_name}', RESEED, 0)"))
 
         for update_instance in updates:
-            update_dict = update_instance.dict(exclude_unset=True) 
-            temp_id = update_dict.pop('id', None)  
+            update_dict = update_instance.dict(exclude={'id'}) 
             db_item = model(**update_dict)
             db.add(db_item)
-            db.flush() 
-            
-            updated_ids.append({"tempId": temp_id, "dbId": db_item.id})
 
         db.commit()
         logger.info(f"Successfully updated table {table_name} with new data")
@@ -178,4 +143,4 @@ async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
         logger.error(f"Failed to update table {table_name}: {e}")
         raise HTTPException(status_code=500, detail="Failed to update data")
 
-    return {"message": "Bulk update successful", "updated_ids": updated_ids}
+    return {"message": "Bulk update successful"}

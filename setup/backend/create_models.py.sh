@@ -76,6 +76,8 @@ echo "DATABASE_NAME = os.getenv('${prefix}_DB')" >> $output_file
 echo "DATABASE_HOST = os.getenv('${prefix}_HOST')" >> $output_file
 echo "DATABASE_PORT = os.getenv('${prefix}_PORT')" >> $output_file
 echo "" >> $output_file
+echo "SCHEMA_NAME = '$schema_name'" >> $output_file
+echo "" >> $output_file
 echo "Base = declarative_base()" >> $output_file
 echo "" >> $output_file
 
@@ -91,7 +93,7 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Start the class definition
     echo "class $class_name(Base):" >> $output_file
     echo "    __tablename__ = '$table_name'" >> $output_file
-    echo "    __table_args__ = {'schema': '$schema_name'}" >> $output_file
+    echo "    __table_args__ = {'schema': 'SCHEMA_NAME'}" >> $output_file
 
     # Loop over the columns to add them to the class
     for column in $(echo $table | jq -r '.columns[] | @base64'); do
