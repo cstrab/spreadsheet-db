@@ -184,7 +184,7 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
 - [ ] Frontend:
     - [x] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
     - [ ] General - Add navigation bar with custom asset symbol and version number
-    - [ ] useGrid.ts - Update alert statements to modals
+    - [ ] useGrid.ts - Update alert statements to modals and button styling
     - [ ] General - Additional error handling and logging
 - [ ] Backend:
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
@@ -266,7 +266,6 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
 - [ ] Backend:
     - [ ] main.py - Troubleshoot why from_orm sqlalchemy does not work
     - [ ] dao.py - Implement table read-only table query for Snowflake data extraction
-    - [ ] main.py - Consider using json_serializer/encoder
 - [ ] Database:
 - [ ] Setup:
     - [ ] General - Consider replacing .sh scripts with python scripts
