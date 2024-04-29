@@ -16,10 +16,12 @@ echo "import './styles/styles.css';" >> $output_file
 echo "import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';" >> $output_file
 echo "import { HomePage } from './pages/HomePage';" >> $output_file
 echo "import { TablePage } from './pages/TablePage';" >> $output_file
+echo "import { Header } from './components/common/Header';" >> $output_file
 echo "" >> $output_file
 echo "const App: React.FC = () => {" >> $output_file
 echo "  return (" >> $output_file
 echo "    <Router>" >> $output_file
+echo "    <Header pageTitle='spreadsheet-db' />" >> $output_file
 echo "      <Routes>" >> $output_file
 echo "        <Route path=\"/\" element={<HomePage />} />" >> $output_file
 
