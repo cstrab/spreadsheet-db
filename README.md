@@ -188,7 +188,7 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
     - [ ] useGrid.ts - Update alert statements to modals
 - [ ] Backend:
     - [ ] dao.py - Implement custom DAO for each data table 
-    - [ ] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
+    - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [ ] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [ ] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)

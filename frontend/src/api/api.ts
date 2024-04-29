@@ -8,7 +8,7 @@ const api = axios.create({
 export const fetchData = async (tableName: string, setLoading: (isLoading: boolean) => void): Promise<ReadResponse> => {
   setLoading(true);
   try {
-    const response = await api.post('/read', { table_name: tableName });
+    const response = await api.get('/read', { params: { table_name: tableName } });
     return {
       data: response.data.data,
       columns: response.data.columns

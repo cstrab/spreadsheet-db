@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from models.schemas import Read, Update, BulkUpdate
+from models.schemas import Update, BulkUpdate
 from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
 from models.models import SCHEMA_NAME
 from utils.database import get_db
@@ -28,11 +28,13 @@ def model_to_dict(instance, fields=None):
     else:
         return {c.key: getattr(instance, c.key, None) for c in instance.__table__.columns}
 
-@app.post("/read")
-def read_table(request: Read, db: Session = Depends(get_db)):
-    table_name = request.table_name
-    skip = request.skip
-    limit = request.limit
+@app.get("/read")
+def read_table(
+    table_name: str = Query(..., description="Name of the table"),
+    skip: int = Query(0, description="Number of records to skip"),
+    limit: int = Query(150000, description="Maximum number of records to return"),
+    db: Session = Depends(get_db),
+    ):
     logger.info("Executing /read endpoint for table: " + table_name)
     
     logger.info(f"Checking if table {table_name} is in mappings and defining model and schema")

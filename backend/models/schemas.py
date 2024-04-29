@@ -98,12 +98,6 @@ class MaterialMasterRead(MaterialMasterBase):
 class MaterialMasterListUpdate(BaseModel):
     data: List[MaterialMasterUpdate]
 
-# Schema for read operations
-class Read(BaseModel):
-    table_name: str
-    skip: int = 0
-    limit: int = 150000
-
 # Function to validate update data based on table_name
 def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[BaseModel]]) -> Any:
     if table_name in model_mapping:
