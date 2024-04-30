@@ -24,7 +24,6 @@ app.add_middleware(
 @app.get("/read")
 def read_table(
     table_name: str = Query(..., description="Name of the table"),
-    skip: int = Query(0, description="Number of records to skip"),
     limit: int = Query(150000, description="Maximum number of records to return"),
     db: Session = Depends(get_db),
     ):
@@ -39,7 +38,7 @@ def read_table(
         raise HTTPException(status_code=404, detail="Table not found")
     
     logger.info(f"Querying database for table: {table_name}")
-    query = db.query(model).offset(skip).limit(limit)
+    query = db.query(model).limit(limit)
     items = (schema(**item.__dict__) for item in query) 
 
     columns = [{"name": column.name, "type": str(column.type).lower()} for column in model.__table__.columns]
