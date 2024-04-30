@@ -183,42 +183,46 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
 
 - [x] Frontend:
     - [x] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
+        - Tested with 150k row data, xlsx import / UI render (3s), update (negligible), bulk update (20s), read (10s)
     - [x] General - Add navigation bar with custom asset symbol and version number
     - [x] General - Incorporate links into navigation bar, main side link "Tables" with dropdown for table list
     - [x] useGrid.ts - Light cleanup of UI and styling
-    - [x] General - Display count of row entries under the AGGrid component
+    - [x] General - Display count of row entries under the AG Grid component
+    - [ ] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
+    - [ ] General - Fix bug where if blank rows are added and update is selected, they remain rendered
 - [ ] Backend:
-    - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
-    - [ ] dao.py - Implement custom DAO for each data table 
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
-    - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
     - [ ] main.py - Fix bug where if in middle of /bulk-update or /read and exit page request continues
+    - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
+    - [ ] dao.py - Implement custom DAO for each data table 
+    - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
+    - [ ] main.py - Update cors middleware
+
 - [x] Database: No Requirements
 - [ ] Setup:
     - [ ] Update .sh files to incorporate any Frontend/Backend changes, may need to put the ID reset as part of shell script by
 passing the database type and then using the correct query statement in dao.py
 - [ ] Local Testing:
-    - [ ] Combine local testing steps to a single docker-compose file, must allow for time for setup to run before starting the app
+    - [ ] Combine setup and build phases into a single docker-compose
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
 - [x] General: 
     - [x] High-level architecture diagram
-    - [ ] Update sample.gif demo
+    - [x] Update sample.gif demo
 
 - [ ] Internal Code Review: 
     - Current Limitations/Feedback:
-
+        
 
 
 ## Phase 3: 
 
-Goal: Deployment and UAT (User Acceptance Testing) in DEV environment
+Goal: UAT (User Acceptance Testing)
 
 
-Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this phase. Breaking changes are expected and more frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Deployment to DEV environment and feedback collection is required.
-
+Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this phase. Breaking changes are expected and more frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Feedback collection is required.
 
 - [ ] Frontend:
 - [ ] Backend:
@@ -237,10 +241,10 @@ Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this 
 
 ## Phase 4: 
 
-Goal: Initial release in PROD environment
+Goal: Initial release
 
 
-Stage: Version 1.0 Release - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but will be flagged as bugs to resolve if occured. Unit test coverage is required (80%) for Frontend and Backend. Deployment to PROD environment is required.
+Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but will be flagged as bugs to resolve if occured. Unit test coverage is required (80%) for Frontend and Backend.
 
 
 - [ ] Frontend:
@@ -266,6 +270,8 @@ Stage: Version 1.0 Release - The app with be considered Version 1.0 after this p
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] useGrid.ts - Consider further refactor of rowHandling functions and possible define cell type mapping in a separate file
     - [ ] useGrid.ts - Update alert statements to modals 
+    - [ ] General - Add tab selection indicator to determine if on Home or Table tab, refer to past project
+    - [ ] General - Make Card component flex with AG Grid width instead of auto flexing to window width
     - [ ] General - Use theme config
     - [ ] General - Additional error handling and logging
 - [ ] Backend:

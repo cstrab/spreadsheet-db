@@ -21,13 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def model_to_dict(instance, fields=None):
-    """Convert an SQLAlchemy model instance into a dictionary."""
-    if fields:
-        return {c: getattr(instance, c, None) for c in fields}
-    else:
-        return {c.key: getattr(instance, c.key, None) for c in instance.__table__.columns}
-
 @app.get("/read")
 def read_table(
     table_name: str = Query(..., description="Name of the table"),
