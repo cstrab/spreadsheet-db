@@ -21,46 +21,70 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/read")
-def read_table(
+async def read_table(
     table_name: str = Query(..., description="Name of the table"),
     limit: int = Query(150000, description="Maximum number of records to return"),
-    db: Session = Depends(get_db),
-    ):
-    logger.info("Executing /read endpoint for table: " + table_name)
-    
-    logger.info(f"Checking if table {table_name} is in mappings and defining model and schema")
+    db: Session = Depends(get_db)
+) -> dict:
+    """
+    Retrieve all data from the specified table.
+
+    Args:
+        table_name (str) - Query Parameter: Name of the table.
+        limit (int) - Query Parameter: Maximum number of records to return.
+
+    Returns:
+        response (dict): Dictionary containing columns (list of column names and data type) and data (list of table records in Pydantic schema format).
+    """
+    logger.info(f"Executing /read endpoint for table: {table_name}")
+
     if table_name in TABLE_MODEL_MAPPING and table_name in TABLE_SCHEMA_MAPPING:
         model = TABLE_MODEL_MAPPING[table_name]
         schema = TABLE_SCHEMA_MAPPING[table_name]["read"]
     else:
         logger.error(f"Table not found in mappings: {table_name}")
         raise HTTPException(status_code=404, detail="Table not found")
-    
+
     logger.info(f"Querying database for table: {table_name}")
     query = db.query(model).limit(limit)
-    items = (schema(**item.__dict__) for item in query) 
-
+    
+    result = [schema(**item.__dict__) for item in query]
     columns = [{"name": column.name, "type": str(column.type).lower()} for column in model.__table__.columns]
-    result = list(items)  
 
     logger.info(f"Returning columns and data for table: {table_name}")
-    return {"columns": columns, "data": result}
+
+    response = {"columns": columns, "data": result}
+    return response
+
 
 @app.patch("/update")
-async def update_table(request: Update, db: Session = Depends(get_db)):
-    table_name = request.table_name
-    updates = request.updates
-    removed_row_ids = request.removed_row_ids
+async def update_table(
+    payload: Update, 
+    db: Session = Depends(get_db)
+) -> dict:
+    """
+    Update specific records in the specified table.
+
+    Args:
+        payload (Update): Update payload containing table name, updates, and removed row IDs.
+
+    Returns:
+        response (dict): Dictionary containg a mapping list of tempIds to updated dbIds.
+    """
+    table_name = payload.table_name
+    updates = payload.updates.data
+    removed_row_ids = payload.removed_row_ids
 
     logger.info(f"Executing /update endpoint for table: {table_name}")
 
-    if table_name not in TABLE_MODEL_MAPPING:
+    if table_name in TABLE_MODEL_MAPPING and table_name in TABLE_SCHEMA_MAPPING:
+        model = TABLE_MODEL_MAPPING[table_name]
+        schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
+    else:
         logger.error(f"Table not found in mappings: {table_name}")
         raise HTTPException(status_code=404, detail="Table not found")
-
-    model = TABLE_MODEL_MAPPING[table_name]
-    schema = TABLE_SCHEMA_MAPPING[table_name]["update"]
 
     for row_id in removed_row_ids:
         db_item = db.query(model).filter(model.id == row_id).first()
@@ -72,7 +96,7 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail=f"Item with id {row_id} not found")
 
     updated_ids = []  
-    for update_instance in updates.data:
+    for update_instance in updates:
         update_dict = update_instance.dict(exclude_unset=True)
         item_id = update_dict.pop("id", None)  
 
@@ -98,12 +122,26 @@ async def update_table(request: Update, db: Session = Depends(get_db)):
     db.commit()
     logger.info(f"Committing changes to the database")
 
-    return {"message": "Update successful", "updated_ids": updated_ids}
+    response = {"updated_ids": updated_ids}
+    return response
+
 
 @app.put("/bulk-update")
-async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
-    table_name = request.table_name
-    updates = request.updates.data
+async def bulk_update_table(
+    payload: BulkUpdate, 
+    db: Session = Depends(get_db)
+) -> None:
+    """
+    Bulk update records in the specified table.
+
+    Args:
+        payload (BulkUpdate): Bulk update payload containing table name and updates.
+
+    Returns:
+        None
+    """
+    table_name = payload.table_name
+    updates = payload.updates.data
 
     logger.info(f"Executing /bulk-update endpoint for table: {table_name}")
 
@@ -117,7 +155,7 @@ async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
         logger.info(f"Clearing all entries from table: {table_name}")
         db.query(model).delete()
 
-        # TODO: Move this to a separate file since it depends on the database type
+        # TODO: Find a better way to handle this with built-in SQLAlchemy methods or move to a separate file since is database-specific
         # PostgreSQL-specific sequence reset
         sequence_name = f"{SCHEMA_NAME}.{table_name}_id_seq"
         db.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
@@ -137,4 +175,4 @@ async def bulk_update_table(request: BulkUpdate, db: Session = Depends(get_db)):
         logger.error(f"Failed to update table {table_name}: {e}")
         raise HTTPException(status_code=500, detail="Failed to update data")
 
-    return {"message": "Bulk update successful"}
+    return None

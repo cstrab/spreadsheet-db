@@ -190,15 +190,16 @@ Stage: Refactoring - Breaking changes are expected, but less frequent during thi
     - [x] General - Display count of row entries under the AG Grid component
     - [ ] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
     - [ ] General - Fix bug where if blank rows are added and update is selected, they remain rendered
+    - [ ] General - Update so that by default whenever page is re-rendered or updated the AG Grid is sorted by id
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [ ] main.py - Fix bug where if in middle of /bulk-update or /read and exit page request continues
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
-    - [ ] dao.py - Implement custom DAO for each data table 
-    - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
+    - [ ] main.py - Clean up schemas for payload and response of each endpoint, also ensure schemas are used as check and if it doesn't match will not update
     - [ ] main.py - Update cors middleware
+    - [ ] dao.py - Implement custom DAO for each data table 
 
 - [x] Database: No Requirements
 - [ ] Setup:
@@ -210,7 +211,7 @@ passing the database type and then using the correct query statement in dao.py
 - [x] Deployment: No requirements
 - [x] General: 
     - [x] High-level architecture diagram
-    - [x] Update sample.gif demo
+    - [x] Update sample.gif demos
 
 - [ ] Internal Code Review: 
     - Current Limitations/Feedback:
@@ -278,6 +279,8 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [ ] main.py - Troubleshoot why from_orm sqlalchemy does not work
     - [ ] General - Additional error handling and logging
     - [ ] dao.py - Implement table read-only table query for Snowflake data extraction
+    - [ ] General - Implement caching to improve data request times
+    - [ ] General - Clean up requirements.txt, add specific package versions
 - [ ] Database:
 - [ ] Setup:
     - [ ] General - Consider replacing .sh scripts with python scripts
