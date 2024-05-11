@@ -9,11 +9,11 @@ Stack:
     - Noteable packages: AG Grid
 - Backend: Python
     - Noteable packages: FastAPI, SQLAlchemy, Pydantic
-- Database: PostresSQL or MSSQL
+- Database: PostresSQL
 
 
 CI/CD:
-- Github Actions or Gitlab CI
+- Github Actions
 - ArgoCD
 
 
@@ -34,11 +34,12 @@ Requirements:
 
 Step 1:
 - Update spreadsheet-db/setup/schema.json file with desired table structure
-    - Note: Must have "id" column with data_type "int_id" for each table
-    - Note: Currently only supports single schema
-    - Note: Fields 'schema_name' and 'column_name' must use '_' if spacing is required
-    - Note: Current 'data_type' options: 'int_id', 'int', 'float', 'str', 'bool', 'date', 'datetime'
-    - Note: Keep all naming conventions lowercase as seen in example
+    - Notes:
+        - Must have "id" column with data_type "int_id" for each table
+        - Currently only supports a single schema
+        - Fields 'schema_name' and 'column_name' must use '_' if spacing is required
+        - Current 'data_type' options: 'int_id', 'int', 'float', 'str', 'bool', 'date', 'datetime'
+        - All naming conventions should be lowercase as seen in example
 
 
 Example: 
@@ -91,9 +92,10 @@ Example:
 
 Step 2:
 - cd into spreadsheet-db/setup folder and run the following command:
-    - Note: This will build all Frontend, Backend, and Database files based off of the schema.json input
-    - Note: Do not proceed to Step 3: until container creates and exits successfully
-    - Note: If you are using Windows, make sure that default EOL for .sh files it set to LF
+    - Notes: 
+        - This will build all Frontend, Backend, and Database files based off of the schema.json input
+        - Do not proceed to Step 3: until container creates and exits successfully
+        - If you are using Windows, make sure that default EOL for .sh files it set to LF
 
 
 ```
@@ -130,7 +132,8 @@ docker compose down -v
 
 Sample Data:
 - Sample data is provided in the spreadsheet-db/setup/data folder
-    - Note: Data must be in .xlsx format and headers must match what is defined in the schema.json file
+    - Notes:
+        - Data must be in .xlsx format and headers must match table columns that are defined in the schema.json file
 
 
 # Roadmap
@@ -164,42 +167,39 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
 - [x] General: No requirements
 
 - [x] Evaluation of POC:
-    - Current Limitations:
-        - Large data tables may experience slow bulk update and read times 
-            - Tested with 150k row data, xlsx import / UI render (3s), update (negligible), bulk update (60s), read (10s)
-        - Works only for a single schema that will contain all tables
-        - Only PostgresSQL database type has been tested
-        - Dockerfiles and docker-compose.yml are not automated by Makefile setup
+    - Large data tables may experience slow bulk update and read times 
+        - Tested with 150k row data, xlsx import / UI render (3s), update (negligible), bulk update (60s), read (10s)
+    - Works only for a single schema that will contain all tables
+    - Only PostgresSQL database type has been tested
+    - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
 
 
 ## Phase 2:
 
-Goal: Code refactoring and optimizations
+Goal: Bug fixes, code refactoring, and optimizations
 
 
-Stage: Refactoring - Breaking changes are expected, but less frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Internal code review is required at the end of this stage.
+Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expected, but less frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements.
 
 
 - [x] Frontend:
     - [x] useGrid.ts - update handleUpdate bulkUpdateData case to predict backend ids after update (i.e. start from id=1 always since we will reset id count for the table), this will improve bulk update performance
-        - Tested with 150k row data, xlsx import / UI render (3s), update (negligible), bulk update (20s), read (10s)
     - [x] General - Add navigation bar with custom asset symbol and version number
     - [x] General - Incorporate links into navigation bar, main side link "Tables" with dropdown for table list
     - [x] useGrid.ts - Light cleanup of UI and styling
     - [x] General - Display count of row entries under the AG Grid component
     - [ ] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
     - [ ] General - Fix bug where if blank rows are added and update is selected, they remain rendered
-    - [ ] General - Update so that by default whenever page is re-rendered or updated the AG Grid is sorted by id
+    - [ ] useGrid.ts - Change alert statements to Material UI modals 
+    - [ ] General - Add tab selection indicator i.e underline or bold
+    - [ ] General - Make card component flex with AG Grid width instead of auto flexing to window width
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [ ] main.py - Fix bug where if in middle of /bulk-update or /read and exit page request continues
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
-    - [ ] main.py - Clean up schemas for payload and response of each endpoint, also ensure schemas are used as check and if it doesn't match will not update
-    - [ ] main.py - Update cors middleware
-    - [ ] dao.py - Implement custom DAO for each data table 
 
 - [x] Database: No Requirements
 - [ ] Setup:
@@ -211,82 +211,58 @@ passing the database type and then using the correct query statement in dao.py
 - [x] Deployment: No requirements
 - [x] General: 
     - [x] High-level architecture diagram
-    - [x] Update sample.gif demos
+    - [x] Update sample.gif demo
 
-- [ ] Internal Code Review: 
-    - Current Limitations/Feedback:
-        
+- [ ] Evaluation of UAT / Refactoring:
+    - Works only for a single schema that will contain all tables
+    - Only PostgresSQL database type has been tested
+    - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
 
 ## Phase 3: 
 
-Goal: UAT (User Acceptance Testing)
-
-
-Stage: MVP (Minimum Viable Product) - The app will be considered MVP after this phase. Breaking changes are expected and more frequent during this phase. Unit test coverage is recommended, but there are no coverage requirements. Feedback collection is required.
-
-- [ ] Frontend:
-- [ ] Backend:
-- [ ] Database:
-- [ ] Setup:
-- [ ] Local Testing:
-- [ ] CI/CD: 
-- [ ] Deployment:
-- [ ] General:
-
-
-- [ ] Evaluation of MVP:
-    - Current Limitations/Feedback:
-
-
-
-## Phase 4: 
-
 Goal: Initial release
 
 
-Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but will be flagged as bugs to resolve if occured. Unit test coverage is required (80%) for Frontend and Backend.
+Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but bugs will recorded to resolve. Unit test coverage is required (80%) for Frontend and Backend.
 
 
 - [ ] Frontend:
+    - [ ] General - Unit tests
 - [ ] Backend:
+    - [ ] General - Unit tests 
 - [ ] Database:
 - [ ] Setup:
 - [ ] Local Testing:
 - [ ] CI/CD: 
+    - [ ] General - Automated docker image build and push to Dockerhub in CI pipeline
+    - [ ] General - Unit tests for Frontend and Backend in CI pipeline
 - [ ] Deployment:
+    - [ ] General - Helm chart for Kubernetes deployment
 - [ ] General:
+    - [ ] General - Update README.md with deployment instructions
 
 
 - [ ] Evaluation of Version 1.0:
-    - Bugs:
 
 
 
-## Backlog: 
+## Backlog / Future Considerations: 
 
 - [ ] Frontend:
-    - [ ] General - New main componenet or modified GenericGrid.tsx that has read-only capability, should just display table data from a database but not allow edit/update
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
-    - [ ] useGrid.ts - Consider further refactor of rowHandling functions and possible define cell type mapping in a separate file
-    - [ ] useGrid.ts - Update alert statements to modals 
-    - [ ] General - Add tab selection indicator to determine if on Home or Table tab, refer to past project
-    - [ ] General - Make Card component flex with AG Grid width instead of auto flexing to window width
-    - [ ] General - Use theme config
-    - [ ] General - Additional error handling and logging
 - [ ] Backend:
-    - [ ] main.py - Troubleshoot why from_orm sqlalchemy does not work
-    - [ ] General - Additional error handling and logging
-    - [ ] dao.py - Implement table read-only table query for Snowflake data extraction
-    - [ ] General - Implement caching to improve data request times
-    - [ ] General - Clean up requirements.txt, add specific package versions
+    - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
+    - [ ] main.py - Update cors middleware for production environment to address security concerns
+    - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
+    - [ ] main.py - Troubleshoot issues with from_orm sqlalchemy does not work
 - [ ] Database:
 - [ ] Setup:
-    - [ ] General - Consider replacing .sh scripts with python scripts
     - [ ] General - Allow for multiple schemas
-    - [ ] General - Consider using FlatBuffers for serialization
+    - [ ] General - Add setup instructions for MSSQL / other relational database type
 - [ ] Local Testing:
 - [ ] CI/CD: 
 - [ ] Deployment:
 - [ ] General:
+    - [ ] General - Test for MSSQL / other relational database type
