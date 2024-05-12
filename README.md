@@ -190,8 +190,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] useGrid.ts - Light cleanup of UI and styling
     - [x] General - Display count of row entries under the AG Grid component
     - [x] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
-    - [ ] General - Fix bug where if blank rows are added and update is selected, they remain rendered
-    - [ ] useGrid.ts - Change alert statements to Material UI modals 
+    - [x] General - Fix bug where if blank rows are added and update is selected, they remain rendered
     - [ ] General - Add tab selection indicator i.e underline or bold
     - [ ] General - Make card component flex with AG Grid width instead of auto flexing to window width
 - [ ] Backend:
@@ -252,6 +251,7 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 - [ ] Frontend:
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
+    - [ ] useGrid.ts - Change alert statements to Material UI modals 
 - [ ] Backend:
     - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
     - [ ] main.py - Update cors middleware for production environment to address security concerns

@@ -116,67 +116,72 @@ const useGrid = (tableName: string) => {
     setIsLoading(true);
     let updateFailed = false;
     try {
-      if (isFileUploaded) {
-        const confirmation = window.confirm("Are you sure you want to perform a bulk update? This will clear and replace the database.");
-        if (confirmation) {
-            await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
-            const newRowsData = rowData.map(row => ({
-                ...row,
-                id: -row.id 
-            }));
-            setRowData(newRowsData.map(row => ({
-                ...row,
-                isValid: checkRowValidity(row, columnDefs)
-            })));
-            alert('Bulk update successful!');
-            setIsFileUploaded(false);
+        if (isFileUploaded) {
+            const confirmation = window.confirm("Are you sure you want to perform a bulk update? This will clear and replace the database.");
+            if (confirmation) {
+                await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
+                const newRowsData = rowData.map(row => ({
+                    ...row,
+                    id: -row.id 
+                }));
+                setRowData(newRowsData.map(row => ({
+                    ...row,
+                    isValid: checkRowValidity(row, columnDefs)
+                })));
+                alert('Bulk update successful!');
+                setIsFileUploaded(false);
+                setRemovedRowIds([]);
+                setChanges({});
+            }
+        } else {
+            const updatePayload = { tableName, data: Object.values(changes), removedRowIds };
+            const updateResult = await updateData(updatePayload, setIsLoading);
+            if (updateResult && updateResult.updated_ids) {
+                const idMap = new Map(updateResult.updated_ids.map(u => [u.tempId, u.dbId]));
+                const newRowsData = rowData.filter(row => 
+                    row.id > 0 || (row.id < 0 && idMap.has(row.id))
+                ).map(row => {
+                    if (row.id < 0 && idMap.has(row.id)) {
+                        const newId = idMap.get(row.id);
+                        if (newId !== undefined) { 
+                            return { ...row, id: newId };
+                        }
+                    }
+                    return row;
+                }).filter(row => row.id !== undefined); 
+                setRowData(newRowsData.map(row => ({
+                    ...row,
+                    isValid: checkRowValidity(row, columnDefs)
+                })));
+                alert('Update successful!');
+            } else {
+                alert("No ID mapping returned from update. No updates were made.");
+            }
             setRemovedRowIds([]);
             setChanges({});
         }
-      } else {
-        const updatePayload = { tableName, data: Object.values(changes), removedRowIds };
-        const updateResult = await updateData(updatePayload, setIsLoading);
-        const idMap = updateResult.updated_ids;
-        if (!idMap) {
-            throw new Error("No ID mapping returned from update.");
-        }
-        const newRowsData = rowData.map(row => {
-          if (row.id < 0) {
-            const update = idMap.find(map => map.tempId === row.id);
-            return update ? { ...row, id: update.dbId } : row;
-          }
-          return row;
-        });
-        setRowData(newRowsData.map(row => ({
-          ...row,
-          isValid: checkRowValidity(row, columnDefs)
-        })));
-        alert('Update successful!');
-        setRemovedRowIds([]);
-        setChanges({});
-      }
     } catch (error) {
-      alert('Failed to update. Please try again.');
-      updateFailed = true;
-      setIsFileUploaded(false);
-      setRemovedRowIds([]);
-      setChanges({});
+        console.log('Error during update:', error);
+        alert('Failed to update. Please try again.');
+        updateFailed = true;
     } finally {
-      setIsLoading(false);
-      if (updateFailed) {
-        fetchData(tableName, setIsLoading)
-          .then(response => {
-            const updatedData = response.data.map(row => ({
-              ...row,
-              isValid: checkRowValidity(row, response.columns)
-            }));
-            setRowData(updatedData);
-          })
-          .catch(error => {
-          });
-      }
+        setIsLoading(false);
+        setIsFileUploaded(false);
+        if (updateFailed) {
+            fetchData(tableName, setIsLoading)
+                .then(response => {
+                    const updatedData = response.data.map(row => ({
+                        ...row,
+                        isValid: checkRowValidity(row, response.columns)
+                    }));
+                    setRowData(updatedData);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
     }
-  };
+};
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
