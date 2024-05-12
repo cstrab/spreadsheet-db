@@ -158,6 +158,7 @@ const useGrid = (tableName: string) => {
     } catch (error) {
       alert('Failed to update. Please try again.');
       updateFailed = true;
+      setIsFileUploaded(false);
       setRemovedRowIds([]);
       setChanges({});
     } finally {

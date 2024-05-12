@@ -189,7 +189,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Incorporate links into navigation bar, main side link "Tables" with dropdown for table list
     - [x] useGrid.ts - Light cleanup of UI and styling
     - [x] General - Display count of row entries under the AG Grid component
-    - [ ] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
+    - [x] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
     - [ ] General - Fix bug where if blank rows are added and update is selected, they remain rendered
     - [ ] useGrid.ts - Change alert statements to Material UI modals 
     - [ ] General - Add tab selection indicator i.e underline or bold
