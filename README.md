@@ -191,7 +191,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Display count of row entries under the AG Grid component
     - [x] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
     - [x] General - Fix bug where if blank rows are added and update is selected, they remain rendered
-    - [ ] General - Add tab selection indicator i.e underline or bold
+    - [x] General - Add tab selection indicator i.e underline or bold
     - [ ] General - Make card component flex with AG Grid width instead of auto flexing to window width
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter

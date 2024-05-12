@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useMatch } from 'react-router-dom';
 import { AppBar, Menu, MenuItem, Stack, Toolbar, Typography } from '@mui/material';
 import '../../assets/sample-logo.png';
+import '../../styles/styles.css';
 
 const VER = process.env.REACT_APP_VERSION ? ` v. ${process.env.REACT_APP_VERSION}` : ` v. DEV`;
 
@@ -13,6 +14,13 @@ interface IHeaderProps {
 
 export const Header: React.FC<IHeaderProps> = ({ pageTitle, menu, sideLinks }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const tableMatches = [
+    useMatch({ path: '/sample-table', end: false }),
+    useMatch({ path: '/material-master', end: false }),
+  ].filter(Boolean);
+
+  const isTableActive = tableMatches.length > 0;
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -46,12 +54,10 @@ export const Header: React.FC<IHeaderProps> = ({ pageTitle, menu, sideLinks }) =
           {VER && <small style={{ fontWeight: 'normal', fontSize: '13px', marginRight: '40px' }}>{VER}</small>}
         </Typography>
         <Stack direction="row" spacing={2} >
-          <NavLink to="/" style={{ fontSize: '18px', color: 'white', textDecoration: 'none', marginRight: '20px', marginBottom: '2px' }}>
+          <NavLink to="/" className={({ isActive }) => isActive ? "nav-link-active" : "nav-link"}>
             Home
           </NavLink>
-          <div onClick={handleMenuOpen} style={{ fontSize: '18px', cursor: 'pointer' }}>
-            Tables
-          </div>
+          <div onClick={handleMenuOpen} className={`nav-link ${isTableActive ? 'nav-link-active' : ''}`}>Tables</div>
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
@@ -60,15 +66,15 @@ export const Header: React.FC<IHeaderProps> = ({ pageTitle, menu, sideLinks }) =
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           >
             <MenuItem onClick={handleMenuClose}>
-              <NavLink to="/sample-table">Sample Table</NavLink>
+              <NavLink to="/sample-table" className="dropdown-link">Sample Table</NavLink>
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <NavLink to="/material-master">Material Master</NavLink>
+              <NavLink to="/material-master" className="dropdown-link">Material Master</NavLink>
             </MenuItem>
           </Menu>
         </Stack>
       </AppBar>
-      <Toolbar style={{ minHeight: '52px' }} />
+      <Toolbar className='header-toolbar' />
     </>
   );
 };
