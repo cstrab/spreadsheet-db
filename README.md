@@ -192,7 +192,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Fix bug where if bulk-update fails the Add Row and Remove Row buttons are still greyed out
     - [x] General - Fix bug where if blank rows are added and update is selected, they remain rendered
     - [x] General - Add tab selection indicator i.e underline or bold
-    - [ ] General - Make card component flex with AG Grid width instead of auto flexing to window width
+    - [x] General - Adjust height flex for TablePage.tsx and HomePage.tsx
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update

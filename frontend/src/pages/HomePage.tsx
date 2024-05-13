@@ -3,7 +3,7 @@ import { Card, CardContent, Typography } from '@mui/material';
 
 export const HomePage: React.FC = () => {
   return (
-    <div>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '95vh' }}>
       <Card variant="outlined" style={{ maxWidth: 400, margin: 'auto' , marginTop: '40px'}}>
         <CardContent>
           <Typography variant="h5" component="h2" marginBottom={'20px'}>

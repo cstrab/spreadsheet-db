@@ -8,7 +8,7 @@ interface TablePageProps {
 
 export const TablePage: React.FC<TablePageProps> = ({ tableName }) => {
   return (
-    <Card style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Card style={{ height: '94.9vh', display: 'flex', flexDirection: 'column' }}>
       <CardContent style={{ flex: 1 }}>
         <Typography variant="h6" component="h2" gutterBottom style={{ color: 'grey', marginTop: '20px', marginLeft: '25px'}}>
           <b>{tableName}</b>
