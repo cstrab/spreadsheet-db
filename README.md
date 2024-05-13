@@ -194,13 +194,14 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Add tab selection indicator i.e underline or bold
     - [x] General - Adjust height flex for TablePage.tsx and HomePage.tsx
     - [x] General - Replace React App and logo with spreadsheet-db
+    - [ ] useGrid.ts - Fix bug where if changing from table to table isLoading=true is not set
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
-    - [ ] main.py - Fix bug where if in middle of /bulk-update or /read and exit page request continues
+    - [x] main.py - Implement request cancel if user exits page while endpoint is still processing
     - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
-
+    
 - [x] Database: No Requirements
 - [ ] Setup:
     - [ ] Update .sh files to incorporate any Frontend/Backend changes, may need to put the ID reset as part of shell script by
@@ -253,12 +254,15 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] useGrid.ts - Change alert statements to Material UI modals 
+    - [ ] General - Refactor for identity column changes in database
 - [ ] Backend:
     - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
     - [ ] main.py - Update cors middleware for production environment to address security concerns
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
     - [ ] main.py - Troubleshoot issues with from_orm sqlalchemy does not work
+    - [ ] General - Refactor for identity column changes in database
 - [ ] Database:
+    - [ ] General - Change primary id column to use identity column instead of sequence
 - [ ] Setup:
     - [ ] General - Allow for multiple schemas
     - [ ] General - Add setup instructions for MSSQL / other relational database type

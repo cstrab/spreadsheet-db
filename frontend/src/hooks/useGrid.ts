@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import axios from 'axios';
 import { fetchData, updateData, bulkUpdateData } from '../api/api';
 import { parseXLSX } from '../utils/xlsxParser';
 import { checkRowValidity, checkInvalidCell } from '../utils/validation';
@@ -16,18 +17,34 @@ const useGrid = (tableName: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const gridApiRef = useRef<GridApi | null>(null);
   const tempId = useRef(-1);
+  const abortCtrlRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    return () => {
+      if (abortCtrlRef.current) {
+        console.log('Component unmounting, aborting ongoing update operations');
+        abortCtrlRef.current.abort();
+      }
+    };
+  }, [tableName]);
+
+  useEffect(() => {
+    console.log('useEffect started - setting up AbortController and fetching data');
+    const controller = new AbortController();
+    console.log('AbortController created:', controller);
+
+    console.log('Fetching data for table:', tableName);
     setIsLoading(true);
-    fetchData(tableName, setIsLoading)
+    fetchData(tableName, setIsLoading, controller)
       .then(response => { 
+        console.log('Fetch successful for table:', tableName, 'Response:', response);
         const { columns, data } = response;
         const processedData: RowData[] = data.map(row => ({
           ...row,
           isValid: checkRowValidity(row, columns)
         }));
         setRowData(processedData);
-
+  
         const defs: ExtendedColDef[] = columns.map((column: any) => ({
           headerName: column.name.charAt(0).toUpperCase() + column.name.slice(1),
           field: column.name,
@@ -43,7 +60,7 @@ const useGrid = (tableName: string) => {
             'invalid-cell': (params: any) => checkInvalidCell(params.data[column.name], column.type)
           }
         }));
-
+  
         defs.push({
           headerName: "Validity",
           field: "isValid",
@@ -52,7 +69,7 @@ const useGrid = (tableName: string) => {
           filter: true,
           sortable: true
         });
-
+  
         defs.push({
           headerName: "",
           field: "remove",
@@ -62,14 +79,23 @@ const useGrid = (tableName: string) => {
           sortable: false,
           resizable: false,
         });
-
+  
         setColumnDefs(defs);
         setIsLoading(false);
       })
       .catch(error => {
-        console.error('Error:', error);
+        if (axios.isCancel(error)) {
+          console.log('Fetch request canceled for table:', tableName, 'Error message:', error.message);
+        } else {
+          console.error('Error fetching data for table:', tableName, 'Error:', error);
+        }
         setIsLoading(false);
       });
+  
+      return () => {
+        console.log('Cleaning up useEffect - aborting fetch for table:', tableName);
+        controller.abort();
+      };
   }, [tableName]);
 
   const handleAddRow = () => {
@@ -113,75 +139,96 @@ const useGrid = (tableName: string) => {
   };
 
   const handleUpdate = async () => {
+    console.log('Starting update operation');
+    abortCtrlRef.current = new AbortController();
+    console.log('AbortController created for update:', abortCtrlRef.current);
+
     setIsLoading(true);
     let updateFailed = false;
     try {
-        if (isFileUploaded) {
-            const confirmation = window.confirm("Are you sure you want to perform a bulk update? This will clear and replace the database.");
-            if (confirmation) {
-                await bulkUpdateData({ tableName, data: rowData }, setIsLoading);
-                const newRowsData = rowData.map(row => ({
-                    ...row,
-                    id: -row.id 
-                }));
-                setRowData(newRowsData.map(row => ({
-                    ...row,
-                    isValid: checkRowValidity(row, columnDefs)
-                })));
-                alert('Bulk update successful!');
-                setIsFileUploaded(false);
-                setRemovedRowIds([]);
-                setChanges({});
-            }
-        } else {
-            const updatePayload = { tableName, data: Object.values(changes), removedRowIds };
-            const updateResult = await updateData(updatePayload, setIsLoading);
-            if (updateResult && updateResult.updated_ids) {
-                const idMap = new Map(updateResult.updated_ids.map(u => [u.tempId, u.dbId]));
-                const newRowsData = rowData.filter(row => 
-                    row.id > 0 || (row.id < 0 && idMap.has(row.id))
-                ).map(row => {
-                    if (row.id < 0 && idMap.has(row.id)) {
-                        const newId = idMap.get(row.id);
-                        if (newId !== undefined) { 
-                            return { ...row, id: newId };
-                        }
-                    }
-                    return row;
-                }).filter(row => row.id !== undefined); 
-                setRowData(newRowsData.map(row => ({
-                    ...row,
-                    isValid: checkRowValidity(row, columnDefs)
-                })));
-                alert('Update successful!');
-            } else {
-                alert("No ID mapping returned from update. No updates were made.");
-            }
-            setRemovedRowIds([]);
-            setChanges({});
+      if (isFileUploaded) {
+        console.log('Performing bulk update');
+        const confirmation = window.confirm("Are you sure you want to perform a bulk update? This will clear and replace the database.");
+        console.log('User confirmation:', confirmation);
+        if (confirmation) {
+          await bulkUpdateData({ tableName, data: rowData }, setIsLoading, abortCtrlRef.current);
+          const newRowsData = rowData.map(row => ({
+            ...row,
+            id: -row.id 
+          }));
+          setRowData(newRowsData.map(row => ({
+            ...row,
+            isValid: checkRowValidity(row, columnDefs)
+          })));
+          alert('Bulk update successful!');
+          setIsFileUploaded(false);
+          setRemovedRowIds([]);
+          setChanges({});
         }
+      } else {
+        console.log('Performing regular update');
+        const updatePayload = { tableName, data: Object.values(changes), removedRowIds };
+        const updateResult = await updateData(updatePayload, setIsLoading, abortCtrlRef.current);
+        console.log('Update result received:', updateResult);
+
+        if (updateResult && updateResult.updated_ids) {
+          const idMap = new Map(updateResult.updated_ids.map(u => [u.tempId, u.dbId]));
+          const newRowsData = rowData.filter(row => 
+            row.id > 0 || (row.id < 0 && idMap.has(row.id))
+          ).map(row => {
+            if (row.id < 0 && idMap.has(row.id)) {
+              const newId = idMap.get(row.id);
+              if (newId !== undefined) { 
+                return { ...row, id: newId };
+              }
+            }
+            return row;
+          }).filter(row => row.id !== undefined); 
+          setRowData(newRowsData.map(row => ({
+            ...row,
+            isValid: checkRowValidity(row, columnDefs)
+          })));
+          alert('Update successful!');
+        } else {
+          alert("No ID mapping returned from update. No updates were made.");
+        }
+        setRemovedRowIds([]);
+        setChanges({});
+      }
     } catch (error) {
+      console.log('Error during update operation:', error);
+      if (axios.isCancel(error)) {
+        console.log('Update request canceled', error.message);
+      } else {
         console.log('Error during update:', error);
         alert('Failed to update. Please try again.');
         updateFailed = true;
+      }
     } finally {
-        setIsLoading(false);
-        setIsFileUploaded(false);
-        if (updateFailed) {
-            fetchData(tableName, setIsLoading)
-                .then(response => {
-                    const updatedData = response.data.map(row => ({
-                        ...row,
-                        isValid: checkRowValidity(row, response.columns)
-                    }));
-                    setRowData(updatedData);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        }
+      console.log('Finalizing update operation');
+      setIsLoading(false);
+      setIsFileUploaded(false);
+      if (updateFailed) {
+        console.log('Update failed, refetching data');
+        fetchData(tableName, setIsLoading, abortCtrlRef.current)
+          .then(response => {
+            const updatedData = response.data.map(row => ({
+              ...row,
+              isValid: checkRowValidity(row, response.columns)
+            }));
+            setRowData(updatedData);
+          })
+            .catch(error => {
+            console.log('Error during refetch:', error);
+            if (axios.isCancel(error)) {
+              console.log('Refetch request canceled', error.message);
+            } else {
+              console.error('Error fetching data after update failure:', error);
+            }
+          });
+      }
     }
-};
+  };  
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;

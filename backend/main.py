@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Request, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -61,6 +61,7 @@ async def read_table(
 
 @app.patch("/update")
 async def update_table(
+    request: Request,
     payload: Update, 
     db: Session = Depends(get_db)
 ) -> dict:
@@ -97,6 +98,11 @@ async def update_table(
 
     updated_ids = []  
     for update_instance in updates:
+        if await request.is_disconnected():
+                logger.info("Client disconnected, rolling back transaction")
+                db.rollback()
+                return HTTPException(status_code=499, detail="Client disconnected")
+        
         update_dict = update_instance.dict(exclude_unset=True)
         item_id = update_dict.pop("id", None)  
 
@@ -125,9 +131,11 @@ async def update_table(
     response = {"updated_ids": updated_ids}
     return response
 
+from fastapi import Request
 
 @app.put("/bulk-update")
 async def bulk_update_table(
+    request: Request,
     payload: BulkUpdate, 
     db: Session = Depends(get_db)
 ) -> None:
@@ -164,6 +172,11 @@ async def bulk_update_table(
         # db.execute(text(f"DBCC CHECKIDENT ('{table_name}', RESEED, 0)"))
 
         for update_instance in updates:
+            if await request.is_disconnected():
+                logger.info("Client disconnected, rolling back transaction")
+                db.rollback()
+                return HTTPException(status_code=499, detail="Client disconnected")
+            
             update_dict = update_instance.dict(exclude={'id'}) 
             db_item = model(**update_dict)
             db.add(db_item)
