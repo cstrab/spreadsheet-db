@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from models.schemas import Update, BulkUpdate
-from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING
+from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING, reset_db_sequence
 from models.models import SCHEMA_NAME
 from utils.database import get_db
 from utils.logger import setup_logger
@@ -162,13 +162,8 @@ async def bulk_update_table(
         logger.info(f"Clearing all entries from table: {table_name}")
         db.query(model).delete()
 
-        # TODO: Find a better way to handle this with built-in SQLAlchemy methods or move to a separate file since is database-specific
-        # PostgreSQL-specific sequence reset
-        sequence_name = f"{SCHEMA_NAME}.{table_name}_id_seq"
-        db.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
-
-        # # MSSQL-specific identity reset
-        # db.execute(text(f"DBCC CHECKIDENT ('{table_name}', RESEED, 0)"))
+        logger.info(f"Resetting sequence for table: {table_name}")
+        reset_db_sequence(db, table_name, SCHEMA_NAME)
 
         for update_instance in updates:
             if await request.is_disconnected():

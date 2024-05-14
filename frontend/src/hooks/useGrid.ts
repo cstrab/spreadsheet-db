@@ -217,6 +217,7 @@ const useGrid = (tableName: string) => {
               isValid: checkRowValidity(row, response.columns)
             }));
             setRowData(updatedData);
+            setIsLoading(false);
           })
             .catch(error => {
             console.log('Error during refetch:', error);

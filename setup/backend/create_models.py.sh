@@ -6,8 +6,8 @@ function snake_to_camel {
 }
 
 # Check if four arguments were provided
-if [ $# -ne 5 ]; then
-    echo "Five arguments required: schema file, mapping file, output file, and database type"
+if [ $# -ne 4 ]; then
+    echo "Four arguments required: schema file, mapping file, output file, and database type"
     exit 1
 fi
 
@@ -15,11 +15,13 @@ fi
 schema_file=$(cat $1)
 mapping=$(cat $2)
 output_file=$3
-database_type=$4
-database_mapping_file=$5
+database_mapping_file=$4
 
 # Extract the schema name from the schema file
 schema_name=$(echo $schema_file | jq -r '.schema_name')
+
+# Extract the database type from the schema file
+database_type=$(echo $schema_file | jq -r '.database_type')
 
 # Read the database_mapping.json file
 database_mapping=$(cat $database_mapping_file)

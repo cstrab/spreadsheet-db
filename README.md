@@ -200,12 +200,11 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [x] main.py - Implement request cancel if user exits page while endpoint is still processing
-    - [ ] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
+    - [x] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
     
 - [x] Database: No Requirements
-- [ ] Setup:
-    - [ ] Update .sh files to incorporate any Frontend/Backend changes, may need to put the ID reset as part of shell script by
-passing the database type and then using the correct query statement in dao.py
+- [x] Setup:
+    - [x] Update .sh files to incorporate any Frontend/Backend changes
 - [ ] Local Testing:
     - [ ] Combine setup and build phases into a single docker-compose
 - [x] CI/CD: No requirements

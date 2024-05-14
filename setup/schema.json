@@ -1,4 +1,5 @@
 {
+    "database_type": "postgresql",
     "schema_name": "sample_schema",
     "tables": [
         {
