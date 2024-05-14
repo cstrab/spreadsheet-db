@@ -44,6 +44,7 @@ const useGrid = (tableName: string) => {
           ...row,
           isValid: checkRowValidity(row, columns)
         }));
+        processedData.sort((a, b) => a.id - b.id);
         setRowData(processedData);
   
         const defs: ExtendedColDef[] = columns.map((column: any) => ({

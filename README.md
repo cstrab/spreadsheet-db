@@ -196,12 +196,13 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Adjust height flex for TablePage.tsx and HomePage.tsx
     - [x] General - Replace React App and logo with spreadsheet-db
     - [x] useGrid.ts - Fix bug where if changing from table to table isLoading=true is not set
+    - [x] General - Autosort rows by id column
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
     - [x] main.py - Change /bulk-update to a PUT request instead of POST since is a full update
     - [x] main.py - Implement request cancel if user exits page while endpoint is still processing
-    - [x] main.py - For bulk-update need to reset ids after database table is cleared, but this syntax is database dependent (i.e. postgres .vs MSSQL, so need have a mapping for this)
+    - [x] main.py - For bulk-update add reset for ids after database table is cleared
     
 - [x] Database: No Requirements
 - [x] Setup:
@@ -215,7 +216,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
 
 - [x] Evaluation of UAT / Refactoring:
     - Works only for a single schema that will contain all tables
-    - Only PostgresSQL database type has been tested
+    - Only PostgresSQL database type has been tested, functionality for MSSQL available but not tested
     - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
 
@@ -250,18 +251,19 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 ## Backlog / Future Considerations: 
 
 - [ ] Frontend:
+    - [ ] useGrid.ts - Modal to prevent updates from user if any false in validation column when update pressed
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
-    - [ ] useGrid.ts - Change alert statements to Material UI modals 
     - [ ] General - Refactor for identity column changes in database
+    - [ ] useGrid.ts - Change alert statements to Material UI modals 
 - [ ] Backend:
     - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
     - [ ] main.py - Update cors middleware for production environment to address security concerns
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
-    - [ ] main.py - Troubleshoot issues with from_orm sqlalchemy does not work
     - [ ] General - Refactor for identity column changes in database
+    - [ ] main.py - Troubleshoot issues with from_orm sqlalchemy does not work
 - [ ] Database:
-    - [ ] General - Change primary id column to use identity column instead of sequence
+    - [ ] General - Change primary id column to use identity column instead of sequence to support multiple users
 - [ ] Setup:
     - [ ] General - Allow for multiple schemas
     - [ ] General - Add setup instructions for MSSQL / other relational database type
@@ -270,3 +272,4 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 - [ ] Deployment:
 - [ ] General:
     - [ ] General - Test for MSSQL / other relational database type
+    - [ ] General - Implement user authentication
