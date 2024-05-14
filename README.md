@@ -197,6 +197,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Replace React App and logo with spreadsheet-db
     - [x] useGrid.ts - Fix bug where if changing from table to table isLoading=true is not set
     - [x] General - Autosort rows by id column
+    - [x] useGrid.ts - Modal to prevent updates from user if any false in validation column when update pressed
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
@@ -251,7 +252,6 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 ## Backlog / Future Considerations: 
 
 - [ ] Frontend:
-    - [ ] useGrid.ts - Modal to prevent updates from user if any false in validation column when update pressed
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] General - Refactor for identity column changes in database

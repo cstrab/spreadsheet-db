@@ -141,6 +141,12 @@ const useGrid = (tableName: string) => {
   };
 
   const handleUpdate = async () => {
+    const invalidRows = rowData.filter(row => row.isValid === false);
+    if (invalidRows.length > 0) {
+      alert('Cannot update. Some rows have invalid data.');
+      return;
+    }
+
     console.log('Starting update operation');
     abortCtrlRef.current = new AbortController();
     console.log('AbortController created for update:', abortCtrlRef.current);
