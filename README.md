@@ -32,7 +32,7 @@ Requirements:
 - Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
 
 
-Step 1:
+Step 1: OPTIONAL - Only required if you want to change schema and table structure, if skipped sample tables will be generated
 - Update spreadsheet-db/setup/schema.json file with desired table structure
     - Notes:
         - Must have "id" column with data_type "int_id" for each table
@@ -45,6 +45,7 @@ Step 1:
 Example: 
 ```
 {
+    "database_type": "postgresql",
     "schema_name": "test_schema",
     "tables": [
         {
@@ -90,7 +91,7 @@ Example:
 ```
     
 
-Step 2:
+Step 2: OPTIONAL - Only required if you want to change schema and table structure, if skipped sample tables will be generated
 - cd into spreadsheet-db/setup folder and run the following command:
     - Notes: 
         - This will build all Frontend, Backend, and Database files based off of the schema.json input
@@ -205,15 +206,14 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
 - [x] Database: No Requirements
 - [x] Setup:
     - [x] Update .sh files to incorporate any Frontend/Backend changes
-- [ ] Local Testing:
-    - [ ] Combine setup and build phases into a single docker-compose
+- [x] Local Testing:
 - [x] CI/CD: No requirements
 - [x] Deployment: No requirements
 - [x] General: 
     - [x] High-level architecture diagram
     - [x] Update sample.gif demo
 
-- [ ] Evaluation of UAT / Refactoring:
+- [x] Evaluation of UAT / Refactoring:
     - Works only for a single schema that will contain all tables
     - Only PostgresSQL database type has been tested
     - Dockerfiles and docker-compose.yml are not automated by Makefile setup
