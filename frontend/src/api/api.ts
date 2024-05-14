@@ -20,8 +20,6 @@ export const fetchData = async (tableName: string, setLoading: (isLoading: boole
       console.error('Failed to fetch data:', error);
     }
     throw error;
-  } finally {
-    setLoading(false);
   }
 };
 
@@ -42,9 +40,7 @@ export const updateData = async ({ tableName, data, removedRowIds }: UpdateDataP
       console.error('Failed to update data:', error);
     }
     throw error;
-  } finally {
-    setLoading(false);
-  }
+  } 
 };
 
 export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload, setLoading: (isLoading: boolean) => void, controller: AbortController): Promise<void> => {
@@ -63,7 +59,5 @@ export const bulkUpdateData = async ({ tableName, data }: BulkUpdateDataPayload,
       console.error('Failed to perform bulk update:', error);
     }
     throw error;
-  } finally {
-    setLoading(false);
-  }
+  } 
 };

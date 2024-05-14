@@ -89,12 +89,12 @@ const useGrid = (tableName: string) => {
         } else {
           console.error('Error fetching data for table:', tableName, 'Error:', error);
         }
-        setIsLoading(false);
       });
   
       return () => {
         console.log('Cleaning up useEffect - aborting fetch for table:', tableName);
         controller.abort();
+        setIsLoading(false);
       };
   }, [tableName]);
 

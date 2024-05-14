@@ -131,7 +131,6 @@ async def update_table(
     response = {"updated_ids": updated_ids}
     return response
 
-from fastapi import Request
 
 @app.put("/bulk-update")
 async def bulk_update_table(

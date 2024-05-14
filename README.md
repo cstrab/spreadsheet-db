@@ -194,7 +194,7 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - [x] General - Add tab selection indicator i.e underline or bold
     - [x] General - Adjust height flex for TablePage.tsx and HomePage.tsx
     - [x] General - Replace React App and logo with spreadsheet-db
-    - [ ] useGrid.ts - Fix bug where if changing from table to table isLoading=true is not set
+    - [x] useGrid.ts - Fix bug where if changing from table to table isLoading=true is not set
 - [ ] Backend:
     - [x] main.py - Change /read to a GET request instead of POST and pass table_name as parameter
     - [x] main.py - Change /update to a PATCH request instead of POST since is a partial update
