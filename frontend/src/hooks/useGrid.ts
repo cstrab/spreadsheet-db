@@ -24,6 +24,7 @@ const useGrid = (tableName: string) => {
       if (abortCtrlRef.current) {
         console.log('Component unmounting, aborting ongoing update operations');
         abortCtrlRef.current.abort();
+        setIsLoading(true);
       }
     };
   }, [tableName]);
@@ -94,7 +95,7 @@ const useGrid = (tableName: string) => {
       return () => {
         console.log('Cleaning up useEffect - aborting fetch for table:', tableName);
         controller.abort();
-        setIsLoading(false);
+        setIsLoading(true);
       };
   }, [tableName]);
 
@@ -198,7 +199,8 @@ const useGrid = (tableName: string) => {
     } catch (error) {
       console.log('Error during update operation:', error);
       if (axios.isCancel(error)) {
-        console.log('Update request canceled', error.message);
+        console.log('Update request canceled');
+        updateFailed = true;
       } else {
         console.log('Error during update:', error);
         alert('Failed to update. Please try again.');
