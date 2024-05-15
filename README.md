@@ -23,7 +23,7 @@ Deployment:
 
 # High-level Architecture
 
-![Architecture Diagram](setup/sample_data/architecture-diagram.png)
+![Architecture Diagram](setup/sample_data/spreadsheet-db.png)
 
 
 # Local Deployment
