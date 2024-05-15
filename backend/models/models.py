@@ -16,8 +16,8 @@ SCHEMA_NAME = 'sample_schema'
 
 Base = declarative_base()
 
-class SampleTable(Base):
-    __tablename__ = 'sample_table'
+class SampleTableTypes(Base):
+    __tablename__ = 'sample_table_types'
     __table_args__ = {'schema': SCHEMA_NAME}
     id = Column(Integer, primary_key=True, index=True)
     string_column = Column(String, index=True)
@@ -27,37 +27,19 @@ class SampleTable(Base):
     date_column = Column(Date, index=True)
     datetime_column = Column(DateTime, index=True)
 
-class MaterialMaster(Base):
-    __tablename__ = 'material_master'
+class SampleTableUsers(Base):
+    __tablename__ = 'sample_table_users'
     __table_args__ = {'schema': SCHEMA_NAME}
     id = Column(Integer, primary_key=True, index=True)
-    plant = Column(String, index=True)
-    material = Column(String, index=True)
-    description = Column(String, index=True)
-    flashpoint = Column(Integer, index=True)
-    is_automation_possible = Column(String, index=True)
-    low_flashpoint = Column(String, index=True)
-    crystal = Column(String, index=True)
-    crystalizes = Column(String, index=True)
-    citrus = Column(String, index=True)
-    refrigerate = Column(String, index=True)
-    nitrogen = Column(String, index=True)
-    heated = Column(String, index=True)
-    difficult_heat = Column(String, index=True)
-    mix_well = Column(String, index=True)
-    viscous = Column(String, index=True)
-    slightly_viscous = Column(String, index=True)
-    solid = Column(String, index=True)
-    solidifies = Column(String, index=True)
-    separates = Column(String, index=True)
-    stench = Column(String, index=True)
-    moss_oleo_resins = Column(String, index=True)
-    wax = Column(String, index=True)
-    special_handling = Column(String, index=True)
-    plastic_storage = Column(String, index=True)
-    supply_issue = Column(String, index=True)
-    phantom = Column(String, index=True)
-    additional_comments = Column(String, index=True)
+    first_name = Column(String, index=True)
+    last_name = Column(String, index=True)
+    email = Column(String, index=True)
+    city = Column(String, index=True)
+    state = Column(String, index=True)
+    zip = Column(Integer, index=True)
+    age = Column(Integer, index=True)
+    date_created = Column(Date, index=True)
+    is_active = Column(Boolean, index=True)
 
 DATABASE_URL = f"{DATABASE_TYPE}://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 

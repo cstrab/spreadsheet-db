@@ -16,8 +16,8 @@ export const Header: React.FC<IHeaderProps> = ({ pageTitle, menu, sideLinks }) =
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const tableMatches = [
-    useMatch({ path: '/sample-table', end: false }),
-    useMatch({ path: '/material-master', end: false }),
+    useMatch({ path: '/sample-table-types', end: false }),
+    useMatch({ path: '/sample-table-users', end: false }),
   ].filter(Boolean);
 
   const isTableActive = tableMatches.length > 0;
@@ -66,10 +66,10 @@ export const Header: React.FC<IHeaderProps> = ({ pageTitle, menu, sideLinks }) =
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           >
             <MenuItem onClick={handleMenuClose}>
-              <NavLink to="/sample-table" className="dropdown-link">Sample Table</NavLink>
+              <NavLink to="/sample-table-types" className="dropdown-link">Sample Table Types</NavLink>
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <NavLink to="/material-master" className="dropdown-link">Material Master</NavLink>
+              <NavLink to="/sample-table-users" className="dropdown-link">Sample Table Users</NavLink>
             </MenuItem>
           </Menu>
         </Stack>

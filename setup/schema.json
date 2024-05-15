@@ -3,7 +3,7 @@
     "schema_name": "sample_schema",
     "tables": [
         {
-            "table_name": "sample_table",
+            "table_name": "sample_table_types",
             "columns": [
                 {
                     "column_name": "id",
@@ -36,119 +36,47 @@
             ]
         },
         {
-            "table_name": "material_master",
+            "table_name": "sample_table_users",
             "columns": [
                 {
                     "column_name": "id",
                     "data_type": "int_id"
                 },
                 {
-                    "column_name": "plant",
+                    "column_name": "first_name",
                     "data_type": "str"
                 },
                 {
-                    "column_name": "material",
+                    "column_name": "last_name",
                     "data_type": "str"
                 },
                 {
-                    "column_name": "description",
+                    "column_name": "email",
                     "data_type": "str"
                 },
                 {
-                    "column_name": "flashpoint",
+                    "column_name": "city",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "state",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "zip",
                     "data_type": "int"
                 },
                 {
-                    "column_name": "is_automation_possible",
-                    "data_type": "str"
+                    "column_name": "age",
+                    "data_type": "int"
                 },
                 {
-                    "column_name": "low_flashpoint",
-                    "data_type": "str"
-                },
+                    "column_name": "date_created",
+                    "data_type": "date"
+                },     
                 {
-                    "column_name": "crystal",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "crystalizes",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "citrus",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "refrigerate",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "nitrogen",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "heated",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "difficult_heat",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "mix_well",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "viscous",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "slightly_viscous",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "solid",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "solidifies",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "separates",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "stench",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "moss_oleo_resins",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "wax",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "special_handling",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "plastic_storage",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "supply_issue",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "phantom",
-                    "data_type": "str"
-                },
-                {
-                    "column_name": "additional_comments",
-                    "data_type": "str"
+                    "column_name": "is_active",
+                    "data_type": "bool"
                 }
             ]
         }

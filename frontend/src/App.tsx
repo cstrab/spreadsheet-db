@@ -11,8 +11,8 @@ const App: React.FC = () => {
     <Header pageTitle='spreadsheet-db' />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/sample-table" element={<TablePage tableName="sample_table" />} />
-        <Route path="/material-master" element={<TablePage tableName="material_master" />} />
+        <Route path="/sample-table-types" element={<TablePage tableName="sample_table_types" />} />
+        <Route path="/sample-table-users" element={<TablePage tableName="sample_table_users" />} />
       </Routes>
     </Router>
   );
