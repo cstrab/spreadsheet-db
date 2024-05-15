@@ -256,6 +256,7 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] General - Refactor for identity column changes in database
     - [ ] useGrid.ts - Change alert statements to Material UI modals 
+    - [ ] General - Cleanup dependencies
 - [ ] Backend:
     - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
     - [ ] main.py - Update cors middleware for production environment to address security concerns
