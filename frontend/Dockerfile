@@ -1,4 +1,4 @@
-FROM node:14 AS build
+FROM node:19.2 AS build
 
 ARG REACT_APP_API_HOST
 ARG REACT_APP_API_PORT
