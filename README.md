@@ -1,46 +1,130 @@
-# spreadsheet-db
+<!-- PROJECT STATS -->
+<a name="readme-top"></a>
 
-An application allowing users to perform CRUD (Create, Read, Update, and Delete) operations on relational database tables through an excel-like user interface
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
+
+    
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/cstrab/spreadsheet-db">
+    <img src="setup/sample_data/sample-logo.png" alt="Logo" width="80" height="80">
+  </a>
+
+<h3 align="center">spreadsheet-db</h3>
+
+  <p align="center">
+    An application allowing users to perform CRUD (Create, Read, Update, and Delete) operations on relational database tables through an excel-like user interface.
+    <br />
+    <a href="https://github.com/cstrab/spreadsheet-db/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/cstrab/spreadsheet-db/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
+
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#high-level-architecture">High Level Architecture</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
 ![Example](setup/sample_data/sample.gif)
 
-Stack:
-- Frontend: React.js
-    - Noteable packages: AG Grid
-- Backend: Python
-    - Noteable packages: FastAPI, SQLAlchemy, Pydantic
-- Database: PostresSQL
+spreadsheet-db allows users to manage relational databases through an excel-like user interface. Core functionalities include basic CRUD operations, bulk uploads from .xlsx files, and grid filtering.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-CI/CD:
-- Github Actions
-- ArgoCD
 
+### Built With
 
-Deployment:
-- Kubernetes
+* [![React][React.js]][React-url]
+* [![Python][Python]][Python-url]
+* [![Postgres][Postgres]][Postgres-url]
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# High-level Architecture
+### High Level Architecture
 
 ![Architecture Diagram](setup/sample_data/spreadsheet-db.png)
 
-
-# Local Deployment
-
-Requirements: 
-- Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-Step 1: OPTIONAL - Only required if you want to change schema and table structure, if skipped sample tables will be generated
-- Update spreadsheet-db/setup/schema.json file with desired table structure
-    - Notes:
-        - Must have "id" column with data_type "int_id" for each table
-        - Currently only supports a single schema
-        - Fields 'schema_name' and 'column_name' must use '_' if spacing is required
-        - Current 'data_type' options: 'int_id', 'int', 'float', 'str', 'bool', 'date', 'datetime'
-        - All naming conventions should be lowercase as seen in example
 
+<!-- GETTING STARTED -->
+## Getting Started
+
+The following sections cover installation instructions using Docker Compose
+
+### Prerequisites
+
+1. Docker
+2. Docker Compose
+
+### Installation
+
+#### Using Sample Tables
+
+1. Clone the repository
+   ```sh
+   git clone https://github.com/cstrab/spreadsheet-db.git
+   ```
+2. Create .env file 
+   ```sh
+   cp .env.sample .env
+   ```
+3. Build and start project
+   ```sh
+   docker compose up -d
+   ``` 
+4. Navigate to [localhost:3000](http://localhost:3000)
+* Note: Sample data is provided in the spreadsheet-db/setup/data folder for testing file upload
+
+#### Using User Defined Tables (Templating for new project)
+
+1. Repeat steps 1. and 2. above
+2. Update spreadsheet/setup/schema.json file with desired 'schema_name" and 'tables':
+* Restrictions: 
+    - Only supports a single schema
+    - Each table must have 'id' column with data_type 'int_id'
+    - Use '_' where spacing is required
+    - Keep naming convention lowercase
+    - Available 'data_type' options: 'int_id', 'int', 'float', 'str', 'bool', 'date', 'datetime'
 
 Example: 
 ```
@@ -89,56 +173,37 @@ Example:
     ]
 }
 ```
-    
 
-Step 2: OPTIONAL - Only required if you want to change schema and table structure, if skipped sample tables will be generated
-- cd into spreadsheet-db/setup folder and run the following command:
-    - Notes: 
-        - This will build all Frontend, Backend, and Database files based off of the schema.json input
-        - Do not proceed to Step 3: until container creates and exits successfully
-        - If you are using Windows, make sure that default EOL for .sh files it set to LF
+3. Rebuild schema dependent files
+* Restrictions
+   - Do not proceed to Step 3: until container creates and exits successfully
+   - If you are using Windows, make sure that default EOL for .sh files it set to LF
+   ```sh
+   cd setup && docker compose build && docker compose up -d
+   ```
+4. Build and start project
+   ```sh
+   cd ../ && docker compose build && docker compose up -d
+   ``` 
+5. Navigate to [localhost:3000](http://localhost:3000)
 
-
-```
-docker compose build --no-cache
-```
-
-```
-docker compose up -d
-```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-Step 3: 
-- cd into spreadsheet-db root directory and run the following commands:
 
-```
-docker compose build --no-cache
-```
+<!-- USAGE EXAMPLES -->
+## Usage
 
-```
-docker compose up -d
-```
+* Data Management UI
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-Step 4: 
-- Navigate to [localhost:3000](http://localhost:3000)
 
+<!-- ROADMAP -->
+## Roadmap
 
-Optional:
-- To stop and clear database volume for the application run the following in the spreadsheet-db root directory:
-
-```
-docker compose down -v
-```
-
-Sample Data:
-- Sample data is provided in the spreadsheet-db/setup/data folder
-    - Notes:
-        - Data must be in .xlsx format and headers must match table columns that are defined in the schema.json file
-
-
-# Roadmap
-## Phase 1:
+### Phase 1:
 
 Goal: Basic functionality
 
@@ -174,9 +239,9 @@ Stage: POC (Proof of Concept) - The app will be considered POC after this phase.
     - Only PostgresSQL database type has been tested
     - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-## Phase 2:
+### Phase 2:
 
 Goal: Bug fixes, code refactoring, and optimizations
 
@@ -220,8 +285,9 @@ Stage: UAT (User Acceptance Testing) / Refactoring - Breaking changes are expect
     - Only PostgresSQL database type has been tested, functionality for MSSQL available but not tested
     - Dockerfiles and docker-compose.yml are not automated by Makefile setup
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Phase 3: 
+### Phase 3: 
 
 Goal: Initial release
 
@@ -247,9 +313,9 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 
 - [ ] Evaluation of Version 1.0:
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-## Backlog / Future Considerations: 
+### Backlog / Future Considerations: 
 
 - [ ] Frontend:
     - [ ] gridInterfaces.ts - Update RowData interface from 'any' to possible schemas for each table
@@ -274,3 +340,75 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 - [ ] General:
     - [ ] General - Test for MSSQL / other relational database type
     - [ ] General - Implement user authentication
+
+See the [open issues](https://github.com/cstrab/spreadsheet-db/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+Your Name - Curt Strab - cstrab@outlook.com
+
+Project Link: [https://github.com/cstrab/spreadsheet-db](https://github.com/cstrab/spreadsheet-db)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* N/A
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/cstrab/spreadsheet-db.svg?style=for-the-badge
+[contributors-url]: https://github.com/cstrab/spreadsheet-db/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/cstrab/spreadsheet-db.svg?style=for-the-badge
+[forks-url]: https://github.com/cstrab/spreadsheet-db/network/members
+[stars-shield]: https://img.shields.io/github/stars/cstrab/spreadsheet-db.svg?style=for-the-badge
+[stars-url]: https://github.com/cstrab/spreadsheet-db/stargazers
+[issues-shield]: https://img.shields.io/github/issues/cstrab/spreadsheet-db.svg?style=for-the-badge
+[issues-url]: https://github.com/cstrab/spreadsheet-db/issues
+[license-shield]: https://img.shields.io/github/license/cstrab/spreadsheet-db.svg?style=for-the-badge
+[license-url]: https://github.com/cstrab/spreadsheet-db/blob/main/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/cstrab/
+[product-screenshot]: images/screenshot.png
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
+[Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[Python-url]: https://python.org/
+[Postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
+[Postgres-url]: https://www.postgresql.org/
