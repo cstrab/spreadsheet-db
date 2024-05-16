@@ -17,7 +17,11 @@ output_file=$2
 
 # Start the mappings.py file
 echo "from typing import Dict, Type, Any" > $output_file
+echo "from sqlalchemy import text" >> $output_file
 echo "" >> $output_file
+
+# Extract the database type from the schema file
+database_type=$(echo $schema_file | jq -r '.database_type')
 
 # Initialize the model and schema names strings
 model_names="Base, "
@@ -84,3 +88,17 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
 done
 
 echo "}" >> $output_file
+echo "" >> $output_file
+
+# Define the reset_db_sequence function based on the database type
+if [ "$database_type" == "postgresql" ]; then
+    echo "def reset_db_sequence(db, table_name, schema_name)-> None:" >> $output_file
+    echo "    sequence_name = f\"{schema_name}.{table_name}_id_seq\"" >> $output_file
+    echo "    db.execute(text(f\"ALTER SEQUENCE {sequence_name} RESTART WITH 1\"))" >> $output_file
+elif [ "$database_type" == "mssql" ]; then
+    echo "def reset_db_sequence(db, table_name)-> None:" >> $output_file
+    echo "    db.execute(text(f\"DBCC CHECKIDENT ('{table_name}', RESEED, 0)\"))" >> $output_file
+else
+    echo "Unsupported database type: $database_type" >&2
+    exit 1
+fi

@@ -8,8 +8,8 @@ from utils.logger import setup_logger
 
 logger = setup_logger('backend')
 
-# Schemas for SampleTable
-class SampleTableBase(BaseModel):
+# Schemas for SampleTableTypes
+class SampleTableTypesBase(BaseModel):
     string_column: Optional[str]
     int_column: Optional[int]
     float_column: Optional[float]
@@ -17,7 +17,7 @@ class SampleTableBase(BaseModel):
     date_column: Optional[date]
     datetime_column: Optional[datetime]
 
-class SampleTableUpdate(BaseModel):
+class SampleTableTypesUpdate(BaseModel):
     id: Optional[int] = None
     string_column: Optional[str] = None
     int_column: Optional[int] = None
@@ -26,17 +26,41 @@ class SampleTableUpdate(BaseModel):
     date_column: Optional[date] = None
     datetime_column: Optional[datetime] = None
 
-class SampleTableRead(SampleTableBase):
+class SampleTableTypesRead(SampleTableTypesBase):
     id: int
 
-class SampleTableListUpdate(BaseModel):
-    data: List[SampleTableUpdate]
+class SampleTableTypesListUpdate(BaseModel):
+    data: List[SampleTableTypesUpdate]
 
-# Schema for read operations
-class Read(BaseModel):
-    table_name: str
-    skip: int = 0
-    limit: int = 150000
+# Schemas for SampleTableUsers
+class SampleTableUsersBase(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    zip: Optional[int]
+    age: Optional[int]
+    date_created: Optional[date]
+    is_active: Optional[bool]
+
+class SampleTableUsersUpdate(BaseModel):
+    id: Optional[int] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip: Optional[int] = None
+    age: Optional[int] = None
+    date_created: Optional[date] = None
+    is_active: Optional[bool] = None
+
+class SampleTableUsersRead(SampleTableUsersBase):
+    id: int
+
+class SampleTableUsersListUpdate(BaseModel):
+    data: List[SampleTableUsersUpdate]
 
 # Function to validate update data based on table_name
 def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[BaseModel]]) -> Any:
@@ -55,7 +79,8 @@ def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[
 class BulkUpdate(BaseModel):
     table_name: str
     updates: Union[
-        SampleTableListUpdate,
+        SampleTableTypesListUpdate,
+        SampleTableUsersListUpdate,
     ]
 
     @validator('updates', pre=True)
@@ -63,7 +88,8 @@ class BulkUpdate(BaseModel):
         table_name = values.get('table_name')
         logger.info(f"Validating bulk updates for table: {table_name}")
         return validate_update_data(v, table_name, {
-            'sample_table': SampleTableListUpdate,
+            'sample_table_types': SampleTableTypesListUpdate,
+            'sample_table_users': SampleTableUsersListUpdate,
         })
 
 # Schema for update operations

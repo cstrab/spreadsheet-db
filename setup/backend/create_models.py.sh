@@ -6,8 +6,8 @@ function snake_to_camel {
 }
 
 # Check if four arguments were provided
-if [ $# -ne 5 ]; then
-    echo "Five arguments required: schema file, mapping file, output file, and database type"
+if [ $# -ne 4 ]; then
+    echo "Four arguments required: schema file, mapping file, output file, and database type"
     exit 1
 fi
 
@@ -15,11 +15,13 @@ fi
 schema_file=$(cat $1)
 mapping=$(cat $2)
 output_file=$3
-database_type=$4
-database_mapping_file=$5
+database_mapping_file=$4
 
 # Extract the schema name from the schema file
 schema_name=$(echo $schema_file | jq -r '.schema_name')
+
+# Extract the database type from the schema file
+database_type=$(echo $schema_file | jq -r '.database_type')
 
 # Read the database_mapping.json file
 database_mapping=$(cat $database_mapping_file)
@@ -76,6 +78,8 @@ echo "DATABASE_NAME = os.getenv('${prefix}_DB')" >> $output_file
 echo "DATABASE_HOST = os.getenv('${prefix}_HOST')" >> $output_file
 echo "DATABASE_PORT = os.getenv('${prefix}_PORT')" >> $output_file
 echo "" >> $output_file
+echo "SCHEMA_NAME = '$schema_name'" >> $output_file
+echo "" >> $output_file
 echo "Base = declarative_base()" >> $output_file
 echo "" >> $output_file
 
@@ -91,7 +95,7 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     # Start the class definition
     echo "class $class_name(Base):" >> $output_file
     echo "    __tablename__ = '$table_name'" >> $output_file
-    echo "    __table_args__ = {'schema': '$schema_name'}" >> $output_file
+    echo "    __table_args__ = {'schema': SCHEMA_NAME}" >> $output_file
 
     # Loop over the columns to add them to the class
     for column in $(echo $table | jq -r '.columns[] | @base64'); do

@@ -85,13 +85,7 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
     echo "" >> $output_file
 done
 
-# Add the Read and Update classes to the file
-echo "# Schema for read operations" >> $output_file
-echo "class Read(BaseModel):" >> $output_file
-echo "    table_name: str" >> $output_file
-echo "    skip: int = 0" >> $output_file
-echo "    limit: int = 150000" >> $output_file
-echo "" >> $output_file
+# Add the Update classes to the file
 echo "# Function to validate update data based on table_name" >> $output_file
 echo "def validate_update_data(v: Any, table_name: str, model_mapping: Dict[str, Type[BaseModel]]) -> Any:" >> $output_file
 echo "    if table_name in model_mapping:" >> $output_file

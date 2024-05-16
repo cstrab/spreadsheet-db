@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # Check if three arguments were provided
-if [ $# -ne 4 ]; then
-    echo "Four arguments required: schema file, database type mapping file, database type, and output file"
+if [ $# -ne 3 ]; then
+    echo "Three arguments required: schema file, database type mapping file, and output file"
     exit 1
 fi
 
 # Read the schema.json file and data type mapping file
 schema_file=$(cat $1)
 database_type_mapping_file=$(cat $2)
-database_type=$3
-output_file=$4
+output_file=$3
 
 # Use jq to parse the JSON and generate the SQL commands
 echo -e "-- Create the schema" > $output_file
@@ -23,6 +22,9 @@ for table in $(echo $schema_file | jq -r '.tables[] | @base64'); do
 
     # Get the table name
     table_name=$(echo $table | jq -r .table_name)
+
+    # Get the database type
+    database_type=$(echo $schema_file | jq -r .database_type)
 
     # Start the CREATE TABLE command
     echo -e "-- Create $table_name" >> $output_file

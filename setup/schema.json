@@ -1,8 +1,9 @@
 {
+    "database_type": "postgresql",
     "schema_name": "sample_schema",
     "tables": [
         {
-            "table_name": "sample_table",
+            "table_name": "sample_table_types",
             "columns": [
                 {
                     "column_name": "id",
@@ -31,6 +32,51 @@
                 {
                     "column_name": "datetime_column",
                     "data_type": "datetime"
+                }
+            ]
+        },
+        {
+            "table_name": "sample_table_users",
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "int_id"
+                },
+                {
+                    "column_name": "first_name",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "last_name",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "email",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "city",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "state",
+                    "data_type": "str"
+                },
+                {
+                    "column_name": "zip",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "age",
+                    "data_type": "int"
+                },
+                {
+                    "column_name": "date_created",
+                    "data_type": "date"
+                },     
+                {
+                    "column_name": "is_active",
+                    "data_type": "bool"
                 }
             ]
         }
