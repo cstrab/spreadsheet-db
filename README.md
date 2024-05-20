@@ -321,7 +321,7 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [ ] useGrid.ts - Change alert statements to Material UI modals 
     - [ ] General - Cleanup dependencies
 - [ ] Backend:
-    - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
+    - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table (Benefits: abstraction, centralization, code reusability, and decoupling)
     - [ ] main.py - Update cors middleware for production environment to address security concerns
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
     - [ ] General - Refactor for identity column changes in database
