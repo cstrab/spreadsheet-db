@@ -26,3 +26,6 @@ yarn-error.log*
 # python cache files
 __pycache__/
 *.py[cod]
+
+# pytest
+.pytest_cache/
