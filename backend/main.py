@@ -139,7 +139,7 @@ async def update_table(
 @app.put("/bulk-update")
 async def bulk_update_table(
     request: Request,
-    payload: BulkUpdate, 
+    payload: Union[BulkUpdate, BulkUpdateUnitTest], 
     db: Session = Depends(get_db)
 ) -> None:
     """
