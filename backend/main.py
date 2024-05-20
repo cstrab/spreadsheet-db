@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from typing import Union
 
 from models.schemas import Update, BulkUpdate
+from tests.schemas import UpdateUnitTest, BulkUpdateUnitTest
 from models.mappings import TABLE_MODEL_MAPPING, TABLE_SCHEMA_MAPPING, reset_db_sequence
 from models.models import SCHEMA_NAME
 from utils.database import get_db
@@ -40,6 +41,9 @@ async def read_table(
     """
     logger.info(f"Executing /read endpoint for table: {table_name}")
 
+    if limit < 0:
+        raise HTTPException(status_code=400, detail="Limit must be a positive integer")
+
     if table_name in TABLE_MODEL_MAPPING and table_name in TABLE_SCHEMA_MAPPING:
         model = TABLE_MODEL_MAPPING[table_name]
         schema = TABLE_SCHEMA_MAPPING[table_name]["read"]
@@ -62,7 +66,7 @@ async def read_table(
 @app.patch("/update")
 async def update_table(
     request: Request,
-    payload: Update, 
+    payload: Union[Update, UpdateUnitTest], 
     db: Session = Depends(get_db)
 ) -> dict:
     """
