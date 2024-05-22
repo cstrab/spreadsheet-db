@@ -8,7 +8,7 @@ jest.mock('../utils/xlsxParser', () => ({
 
 describe('handleFileUpload', () => {
   it('should process valid file and update state', async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useGrid('testTable'));
+    const { result, waitForNextUpdate } = renderHook(() => useGrid('test_table'));
     const mockFile = new File(['test'], 'test.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     parseXLSX.mockResolvedValue({ data: [{ id: 1, someField: 'data' }], isValid: true });
@@ -32,7 +32,7 @@ describe('handleFileUpload', () => {
   });
 
   it('should alert and not update state if file is invalid', async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useGrid('testTable'));
+    const { result, waitForNextUpdate } = renderHook(() => useGrid('test_table'));
     const mockFile = new File(['test'], 'test.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     parseXLSX.mockResolvedValue({ data: [], isValid: false });
@@ -60,7 +60,7 @@ describe('handleFileUpload', () => {
   });
 
   it('should handle exceptions during file processing', async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useGrid('testTable'));
+    const { result, waitForNextUpdate } = renderHook(() => useGrid('test_table'));
     const mockFile = new File(['test'], 'test.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     parseXLSX.mockRejectedValue(new Error('Failed to process file'));

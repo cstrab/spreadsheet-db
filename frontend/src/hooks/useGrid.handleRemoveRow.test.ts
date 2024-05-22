@@ -3,7 +3,7 @@ import useGrid from '../hooks/useGrid';
 
 describe('handleRemoveRow', () => {
   it('should remove a specified row from rowData and record its ID', () => {
-    const { result } = renderHook(() => useGrid('testTable'));
+    const { result } = renderHook(() => useGrid('test_table'));
 
     act(() => {
       result.current.handleAddRow();

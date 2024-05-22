@@ -3,7 +3,7 @@ import useGrid from '../hooks/useGrid';
 
 describe('handleAddRow', () => {
     it('should add a new row to rowData with correct values', () => {
-      const { result } = renderHook(() => useGrid('testTable'));
+      const { result } = renderHook(() => useGrid('test_table'));
 
       act(() => {
         result.current.handleAddRow();
