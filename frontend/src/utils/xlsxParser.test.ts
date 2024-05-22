@@ -10,6 +10,13 @@ class MockFileReader {
   }
 }
 
+class MockFileReaderWithError {
+  onerror: any;
+  readAsBinaryString(file: File) {
+    this.onerror(new Error('Mock error'));
+  }
+}
+
 global.FileReader = MockFileReader as any;
 
 describe('parseXLSX', () => {
@@ -90,5 +97,14 @@ describe('parseXLSX', () => {
       ],
       isValid: true,
     });
+  });
+
+  it('should throw an error if reading the file fails', async () => {
+    global.FileReader = MockFileReaderWithError as any;
+  
+    const mockFile = new File([''], 'filename.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const columnDefs = [{ field: 'header1' }, { field: 'header2' }];
+  
+    await expect(parseXLSX(mockFile, columnDefs)).rejects.toThrow('Mock error');
   });
 });

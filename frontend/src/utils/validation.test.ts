@@ -38,7 +38,7 @@ describe('checkInvalidCell', () => {
 
   it('should return false for unknown types', () => {
     expect(checkInvalidCell('123', 'unknown')).toBe(false);
-  });
+  });  
 });
 
 describe('checkRowValidity', () => {
