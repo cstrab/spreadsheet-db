@@ -35,6 +35,10 @@ describe('checkInvalidCell', () => {
     expect(checkInvalidCell('2020-01-01T12:00:00', 'datetime')).toBe(false);
     expect(checkInvalidCell('2020-01-01 12:00:00', 'datetime')).toBe(true);
   });
+
+  it('should return false for unknown types', () => {
+    expect(checkInvalidCell('123', 'unknown')).toBe(false);
+  });
 });
 
 describe('checkRowValidity', () => {
@@ -164,4 +168,16 @@ describe('checkRowValidity', () => {
 
         expect(checkRowValidity(row, columns)).toBe(true);
     });
+
+    it('should return false for columns without cellDataTypeAPI', () => {
+        const row = {
+          header1: '123',
+        };
+    
+        const columns = [
+          { field: 'header1' },
+        ];
+    
+        expect(checkRowValidity(row, columns)).toBe(false);
+      });
 });

@@ -59,6 +59,13 @@
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!axios).+\\.js$"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "src/index.js",
+      "src/utils/reportWebVitals.js",
+      "src/interfaces/apiInterfaces.ts",
+      "src/interfaces/gridInterfaces.ts"
     ]
   }
 }
