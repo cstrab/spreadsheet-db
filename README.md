@@ -101,20 +101,16 @@ The following sections cover installation instructions using Docker Compose
    ```sh
    git clone https://github.com/cstrab/spreadsheet-db.git
    ```
-2. Create .env file 
-   ```sh
-   cp .env.sample .env
-   ```
-3. Build and start project
+2. Build and start project
    ```sh
    docker compose up -d
    ``` 
-4. Navigate to [localhost:3000](http://localhost:3000)
+3. Navigate to [localhost:3000](http://localhost:3000)
 * Note: Sample data is provided in the spreadsheet-db/setup/data folder for testing file upload
 
 #### Using User Defined Tables (Templating for new project)
 
-1. Repeat steps 1. and 2. above
+1. Repeat step 1. above
 2. Update spreadsheet/setup/schema.json file with desired 'schema_name" and 'tables':
 * Restrictions: 
     - Only supports a single schema
