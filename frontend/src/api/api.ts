@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ReadResponse, UpdateResponse, UpdateDataPayload, BulkUpdateDataPayload } from '../interfaces/apiInterfaces';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: `http://${process.env.REACT_APP_API_HOST || 'localhost'}:${process.env.REACT_APP_API_PORT || '8000'}`,
 });
 
