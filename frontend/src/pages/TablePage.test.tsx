@@ -8,20 +8,20 @@ jest.mock('../components/main/GenericGrid', () => {
 });
 
 describe('TablePage', () => {
-it('should render the table name', () => {
-    const tableName = 'test_table';
-    render(<TablePage tableName={tableName} />);
-    
-    const tableNameElements = screen.getAllByText(tableName);
-    expect(tableNameElements.length).toBe(2);
-    });      
+    it('should render the table name', () => {
+        const tableName = 'test_table';
+        render(<TablePage tableName={tableName} />);
+        
+        const tableNameElements = screen.getAllByText(tableName);
+        expect(tableNameElements.length).toBe(2);
+        });      
 
-  it('should render the GenericGrid component', () => {
-    const tableName = 'test_table';
-    render(<TablePage tableName={tableName} />);
+      it('should render the GenericGrid component', () => {
+        const tableName = 'test_table';
+        render(<TablePage tableName={tableName} />);
 
-    const genericGridElement = screen.getByTestId('genericGrid');
-    expect(genericGridElement).toBeInTheDocument();
-    expect(genericGridElement.textContent).toBe(tableName);
-  });
+        const genericGridElement = screen.getByTestId('genericGrid');
+        expect(genericGridElement).toBeInTheDocument();
+        expect(genericGridElement.textContent).toBe(tableName);
+    });
 });

@@ -1,44 +1,44 @@
 import { checkInvalidCell, checkRowValidity } from './validation';
 
 describe('checkInvalidCell', () => {
-  it('should return false for null values', () => {
-    expect(checkInvalidCell(null, 'integer')).toBe(false);
-  });
+    it('should return false for null values', () => {
+      expect(checkInvalidCell(null, 'integer')).toBe(false);
+    });
 
-  it('should validate integer values correctly', () => {
-    expect(checkInvalidCell('123', 'integer')).toBe(false);
-    expect(checkInvalidCell('123.45', 'integer')).toBe(true);
-  });
+    it('should validate integer values correctly', () => {
+      expect(checkInvalidCell('123', 'integer')).toBe(false);
+      expect(checkInvalidCell('123.45', 'integer')).toBe(true);
+    });
 
-  it('should validate float values correctly', () => {
-    expect(checkInvalidCell('123.45', 'float')).toBe(false);
-    expect(checkInvalidCell('abc', 'float')).toBe(true);
-  });
+    it('should validate float values correctly', () => {
+      expect(checkInvalidCell('123.45', 'float')).toBe(false);
+      expect(checkInvalidCell('abc', 'float')).toBe(true);
+    });
 
-  it('should validate varchar values correctly', () => {
-    expect(checkInvalidCell('abc', 'varchar')).toBe(false);
-    expect(checkInvalidCell(123, 'varchar')).toBe(true);
-  });
+    it('should validate varchar values correctly', () => {
+      expect(checkInvalidCell('abc', 'varchar')).toBe(false);
+      expect(checkInvalidCell(123, 'varchar')).toBe(true);
+    });
 
-  it('should validate boolean values correctly', () => {
-    expect(checkInvalidCell(true, 'boolean')).toBe(false);
-    expect(checkInvalidCell('true', 'boolean')).toBe(false);
-    expect(checkInvalidCell('abc', 'boolean')).toBe(true);
-  });
+    it('should validate boolean values correctly', () => {
+      expect(checkInvalidCell(true, 'boolean')).toBe(false);
+      expect(checkInvalidCell('true', 'boolean')).toBe(false);
+      expect(checkInvalidCell('abc', 'boolean')).toBe(true);
+    });
 
-  it('should validate date values correctly', () => {
-    expect(checkInvalidCell('2020-01-01', 'date')).toBe(false);
-    expect(checkInvalidCell('01-01-2020', 'date')).toBe(true);
-  });
+    it('should validate date values correctly', () => {
+      expect(checkInvalidCell('2020-01-01', 'date')).toBe(false);
+      expect(checkInvalidCell('01-01-2020', 'date')).toBe(true);
+    });
 
-  it('should validate datetime values correctly', () => {
-    expect(checkInvalidCell('2020-01-01T12:00:00', 'datetime')).toBe(false);
-    expect(checkInvalidCell('2020-01-01 12:00:00', 'datetime')).toBe(true);
-  });
+    it('should validate datetime values correctly', () => {
+      expect(checkInvalidCell('2020-01-01T12:00:00', 'datetime')).toBe(false);
+      expect(checkInvalidCell('2020-01-01 12:00:00', 'datetime')).toBe(true);
+    });
 
-  it('should return false for unknown types', () => {
-    expect(checkInvalidCell('123', 'unknown')).toBe(false);
-  });  
+    it('should return false for unknown types', () => {
+      expect(checkInvalidCell('123', 'unknown')).toBe(false);
+    });  
 });
 
 describe('checkRowValidity', () => {
