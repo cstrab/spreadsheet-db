@@ -8,7 +8,6 @@ on:
 
 jobs:
   unit_tests_backend:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -16,31 +15,66 @@ jobs:
 
     - name: Run docker compose
       run: |
-        POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
-        POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
-        POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-        POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-        POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-        FASTAPI_PORT=${{ secrets.FASTAPI_PORT }} \
-        REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }} \
-        REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }} \
-        REACT_APP_PORT=${{ secrets.REACT_APP_PORT }} \
-        REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }} \
+        POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+        POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+        POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+        FASTAPI_PORT=${{ secrets.FASTAPI_PORT }}
+        REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }}
+        REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
+        REACT_APP_PORT=${{ secrets.REACT_APP_PORT }}
+        REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
         docker compose up -d
 
     - name: Install packages in docker container
       run: |
         docker exec spreadsheet-db-backend-1 pip install coverage pytest coveralls
 
-    - name: Run tests with coverage
+    - name: Run backend tests with coverage
       run: |
         docker exec spreadsheet-db-backend-1 coverage run -m pytest
 
-    - name: Generate coverage report
+    - name: Generate backend coverage report
       run: |
-        docker exec spreadsheet-db-backend-1 coverage report
-        docker exec spreadsheet-db-backend-1 coverage xml
+        docker exec spreadsheet-db-backend-1 coverage xml -o coverage-backend.xml
 
-    - name: Upload coverage to coveralls
+  unit_tests_frontend:
+    needs: unit_tests_backend
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '19.2' 
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run frontend tests with coverage
+      run: npm test -- --coverage
+
+    - name: Generate frontend coverage report
+      run: mv coverage/lcov.info coverage-frontend.info
+
+  merge_and_upload_coverage:
+    needs: [unit_tests_backend, unit_tests_frontend]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Merge coverage reports
       run: |
-        docker exec -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} spreadsheet-db-backend-1 coveralls
+        # Example command, adjust based on actual tool/command available
+        # to merge XML or lcov coverage reports
+        coveralls-lcov -v -n coverage-frontend.info coverage-backend.xml > coverage-final.info
+
+    - name: Upload merged coverage to coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        path-to-lcov: ./coverage-final.info
