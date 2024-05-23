@@ -7,75 +7,71 @@ on:
     branches: [ main ]
 
 jobs:
+  setup_environment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run docker compose
+        run: |
+          # Exporting all environment variables needed
+          export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+          export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+          export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          export FASTAPI_PORT=${{ secrets.FASTAPI_PORT }}
+          export REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }}
+          export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
+          export REACT_APP_PORT=${{ secrets.REACT_APP_PORT }}
+          export REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
+          docker compose up -d
+
   unit_tests_backend:
+    needs: setup_environment
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Install packages in backend container
+        run: |
+          docker exec spreadsheet-db-backend-1 pip install coverage pytest coveralls
 
-    - name: Run docker compose
-      run: |
-        # Exporting all environment variables needed
-        export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
-        export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
-        export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-        export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-        export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-        export FASTAPI_PORT=${{ secrets.FASTAPI_PORT }}
-        export REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }}
-        export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
-        export REACT_APP_PORT=${{ secrets.REACT_APP_PORT }}
-        export REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
-        docker compose up -d
+      - name: Run backend tests with coverage
+        run: |
+          docker exec spreadsheet-db-backend-1 coverage run -m pytest
 
-    - name: Install packages in docker container
-      run: |
-        docker exec spreadsheet-db-backend-1 pip install coverage pytest coveralls
-
-    - name: Run backend tests with coverage
-      run: |
-        docker exec spreadsheet-db-backend-1 coverage run -m pytest
-
-    - name: Generate backend coverage report
-      run: |
-        docker exec spreadsheet-db-backend-1 coverage xml -o coverage-backend.xml
+      - name: Generate backend coverage report
+        run: |
+          docker exec spreadsheet-db-backend-1 coverage xml -o coverage-backend.xml
 
   unit_tests_frontend:
-    needs: unit_tests_backend
+    needs: setup_environment
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Run frontend tests with coverage
+        run: |
+          docker exec spreadsheet-db-frontend-1 npm test -- --coverage
 
-    - name: Install Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '19.2' 
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run frontend tests with coverage
-      run: npm test -- --coverage
-
-    - name: Generate frontend coverage report
-      run: mv coverage/lcov.info coverage-frontend.info
+      - name: Generate frontend coverage report
+        run: |
+          docker exec spreadsheet-db-frontend-1 mv coverage/lcov.info coverage-frontend.info
 
   merge_and_upload_coverage:
     needs: [unit_tests_backend, unit_tests_frontend]
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Merge coverage reports
+        run: |
+          # Adjust merging command based on actual tool/command availability
+          # Example command below for demonstration
+          coveralls-lcov -v -n coverage-frontend.info coverage-backend.xml > coverage-final.info
 
-    - name: Merge coverage reports
-      run: |
-        # Example command, adjust based on actual tool/command available
-        # to merge XML or lcov coverage reports
-        coveralls-lcov -v -n coverage-frontend.info coverage-backend.xml > coverage-final.info
-
-    - name: Upload merged coverage to coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        path-to-lcov: ./coverage-final.info
+      - name: Upload merged coverage to coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: ./coverage-final.info
