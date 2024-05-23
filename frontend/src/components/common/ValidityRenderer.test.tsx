@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ValidityRenderer from './ValidityRenderer';
 
 describe('ValidityRenderer', () => {
@@ -10,8 +10,8 @@ describe('ValidityRenderer', () => {
         },
       };
 
-      const { getByText } = render(<ValidityRenderer {...props} />);
-      expect(getByText('Valid')).toBeInTheDocument();
+      render(<ValidityRenderer {...props} />);
+      expect(screen.getByText('Valid')).toBeInTheDocument();
     });
 
     it('should render "Invalid" when isValid is false', () => {
@@ -22,7 +22,7 @@ describe('ValidityRenderer', () => {
         },
       };
 
-      const { getByText } = render(<ValidityRenderer {...props} />);
-      expect(getByText('Invalid')).toBeInTheDocument();
+      render(<ValidityRenderer {...props} />);
+      expect(screen.getByText('Invalid')).toBeInTheDocument();
     });
 });

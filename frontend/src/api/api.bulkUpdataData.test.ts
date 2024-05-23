@@ -1,6 +1,6 @@
 import { api, bulkUpdateData } from './api';
-import MockAdapter from 'axios-mock-adapter';
 import { BulkUpdateDataPayload} from '../interfaces/apiInterfaces';
+import MockAdapter from 'axios-mock-adapter';
 
 describe('bulkUpdateData', () => {
     const mock = new MockAdapter(api);

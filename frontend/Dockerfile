@@ -7,8 +7,12 @@ ARG REACT_APP_NGINX_PORT
 
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY . ./
+RUN find . -type f -name '*.test.tsx' -delete \
+    && find . -type f -name '*.test.ts' -delete \
+    && find . -type f -name '*.test.jsx' -delete \
+    && find . -type f -name '*.test.js' -delete
 RUN REACT_APP_API_HOST=${REACT_APP_API_HOST} \
     REACT_APP_API_PORT=${REACT_APP_API_PORT} \
     REACT_APP_PORT=${REACT_APP_PORT} \

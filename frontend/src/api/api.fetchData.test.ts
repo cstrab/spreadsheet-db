@@ -1,6 +1,6 @@
 import { api, fetchData } from './api';
-import MockAdapter from 'axios-mock-adapter';
 import { ReadResponse } from '../interfaces/apiInterfaces';
+import MockAdapter from 'axios-mock-adapter';
 
 describe('fetchData', () => {
   const mock = new MockAdapter(api);
