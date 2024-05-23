@@ -288,10 +288,10 @@ Goal: Initial release
 Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but bugs will recorded to resolve. Unit test coverage is required (80%) for Frontend and Backend.
 
 
-- [ ] Frontend:
-    - [ ] General - Unit tests
-- [ ] Backend:
-    - [ ] General - Unit tests 
+- [x] Frontend:
+    - [x] General - Unit tests
+- [x] Backend:
+    - [x] General - Unit tests 
 - [ ] Database:
 - [ ] Setup:
 - [ ] Local Testing:
