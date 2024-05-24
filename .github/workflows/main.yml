@@ -7,10 +7,11 @@ on:
     branches: [ main ]
 
 jobs:
-  setup_environment:
+  unit_tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Run docker compose
         run: |
           # Exporting all environment variables needed
@@ -26,64 +27,49 @@ jobs:
           export REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
           docker compose up -d
 
-  unit_tests_backend:
-    needs: setup_environment
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
       - name: Install packages in backend container
         run: |
-          docker exec spreadsheet-db-backend-1 pip install coverage pytest coveralls
+          docker exec spreadsheet-db-backend-1 pip install coverage pytest coveragepy-lcov
 
       - name: Run backend tests with coverage
         run: |
           docker exec spreadsheet-db-backend-1 coverage run -m pytest
 
-      - name: Generate backend coverage report
+      - name: Generate backend coverage report in lcov format
         run: |
-          docker exec spreadsheet-db-backend-1 coverage xml -o coverage-backend.xml
-          docker cp spreadsheet-db-backend-1:/path/to/coverage-backend.xml ./coverage-backend.xml
+          docker exec spreadsheet-db-backend-1 coveragepy-lcov -o coverage-backend.info
 
-  unit_tests_frontend:
-      needs: setup_environment
-      runs-on: ubuntu-latest
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '19.2' 
 
-      steps:
-        - uses: actions/checkout@v2
-        - name: Setup Node.js environment
-          uses: actions/setup-node@v2
-          with:
-            node-version: '19.2' 
-        - name: Install dependencies
-          run: npm ci --legacy-peer-deps
-        - name: Run frontend tests with coverage
-          run: npm test -- --coverage
-        - name: Generate frontend coverage report
-          run: npx lcov-result-merger 'coverage/**/*.info' > coverage-frontend.info
+      - name: Install dependencies
+        run: | 
+          cd frontend 
+          npm ci --legacy-peer-deps
 
-  merge_and_upload_coverage:
-      needs: [unit_tests_backend, unit_tests_frontend]
-      runs-on: ubuntu-latest
+      - name: Run frontend tests with coverage
+        run: | 
+          cd frontend 
+          npm test -- --coverage
 
-      steps:
-        - uses: actions/checkout@v2
-        - name: Merge coverage reports
-          run: |
-            # Convert XML to LCOV
-            npx coverage-istanbul-libxml2lcov < coverage-backend.xml > coverage-backend.lcov
-            # Merge LCOV files
-            npx lcov-result-merger 'coverage-*.lcov' > coverage-final.lcov
-        - name: Upload merged coverage to coveralls
-          uses: coverallsapp/github-action@master
-          with:
-            github-token: ${{ secrets.github_token }}
-            path-to-lcov: ./coverage-final.lcov
+      - name: Generate frontend coverage report
+        run: | 
+          cd frontend 
+          npx lcov-result-merger 'coverage/**/*.info' > coverage-frontend.info
 
-  cleanup:
-    needs: [unit_tests_backend, unit_tests_frontend, merge_and_upload_coverage]
-    runs-on: ubuntu-latest
+      - name: Display coverage file content
+        run: |
+          cat ./backend/coverage-backend.info
+          cat ./frontend/coverage-frontend.info
 
-    steps:
-      - name: Stop Docker Compose environment
-        run: docker compose down
+      - name: Merge coverage reports
+        run: |
+          npx lcov-result-merger 'backend/coverage-backend.info' 'frontend/coverage-frontend.info' > coverage-final.lcov
+
+      - name: Upload merged coverage to coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: ./coverage-final.lcov
