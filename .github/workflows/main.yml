@@ -14,7 +14,6 @@ jobs:
 
       - name: Run docker compose
         run: |
-          # Exporting all environment variables needed
           export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
           export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
           export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
@@ -29,15 +28,11 @@ jobs:
 
       - name: Install packages in backend container
         run: |
-          docker exec spreadsheet-db-backend-1 pip install coverage pytest coveragepy-lcov
+          docker exec spreadsheet-db-backend-1 pip install pytest-cov
 
-      - name: Run backend tests with coverage
+      - name: Run backend tests with direct lcov coverage report
         run: |
-          docker exec spreadsheet-db-backend-1 coverage run -m pytest
-
-      - name: Generate backend coverage report in lcov format
-        run: |
-          docker exec spreadsheet-db-backend-1 coveragepy-lcov -o coverage-backend.info
+          docker exec spreadsheet-db-backend-1 pytest --cov=. --cov-report=lcov:coverage-backend.info
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
@@ -59,17 +54,23 @@ jobs:
           cd frontend 
           npx lcov-result-merger 'coverage/**/*.info' > coverage-frontend.info
 
-      - name: Display coverage file content
+      - name: Adjust paths in backend coverage report
         run: |
-          cat ./backend/coverage-backend.info
-          cat ./frontend/coverage-frontend.info
+          sed -i 's/^SF:/SF:backend\//g' ./backend/coverage-backend.info
 
-      - name: Merge coverage reports
+      - name: Adjust paths in frontend coverage report
         run: |
-          npx lcov-result-merger 'backend/coverage-backend.info' 'frontend/coverage-frontend.info' > coverage-final.lcov
+          sed -i 's/^SF:/SF:frontend\//g' ./frontend/coverage-frontend.info
 
-      - name: Upload merged coverage to coveralls
+      - name: Upload backend coverage to Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
-          path-to-lcov: ./coverage-final.lcov
+          path-to-lcov: ./backend/coverage-backend.info
+
+      - name: Upload frontend coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: ./frontend/coverage-frontend.info
+

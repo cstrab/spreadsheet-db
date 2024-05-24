@@ -5,7 +5,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-    
+[![Coverage Status][coverage-shield]][coverage-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -69,9 +69,9 @@ spreadsheet-db allows users to manage relational databases through an excel-like
 
 ### Built With
 
-* [![React][React.js]][React-url]
-* [![Python][Python]][Python-url]
-* [![Postgres][Postgres]][Postgres-url]
+* [![React][react.js]][react-url]
+* [![Python][python]][python-url]
+* [![Postgres][postgres]][postgres-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -292,12 +292,12 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [x] General - Unit tests
 - [x] Backend:
     - [x] General - Unit tests 
-- [ ] Database:
-- [ ] Setup:
-- [ ] Local Testing:
-- [ ] CI/CD: 
+- [x] Database:
+- [x] Setup:
+- [x] Local Testing:
+- [x] CI/CD: 
+    - [x] General - Unit tests for Frontend and Backend in CI pipeline 
     - [ ] General - Automated docker image build and push to Dockerhub in CI pipeline
-    - [ ] General - Unit tests for Frontend and Backend in CI pipeline 
 - [ ] Deployment:
     - [ ] General - Helm chart for Kubernetes deployment
 - [ ] General:
@@ -399,9 +399,11 @@ Your Name - Curt Strab - cstrab@outlook.com
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/cstrab/
 [product-screenshot]: images/screenshot.png
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
-[Python-url]: https://python.org/
-[Postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
-[Postgres-url]: https://www.postgresql.org/
+[react.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[react-url]: https://reactjs.org/
+[python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[python-url]: https://python.org/
+[postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
+[postgres-url]: https://www.postgresql.org/
+[coverage-shield]: https://img.shields.io/coveralls/github/cstrab/spreadsheet-db.svg?style=for-the-badge
+[coverage-url]: https://coveralls.io/github/cstrab/spreadsheet-db?branch=main
