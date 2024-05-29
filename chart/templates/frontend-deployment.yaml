@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.name }}
+    spec:
+      containers:
+      - name: {{ .Values.frontend.name }}
+        image: {{ .Values.frontend.image }}
+        env:
+        - name: REACT_APP_API_HOST
+          value: {{ .Values.backend.name }}
+        - name: REACT_APP_API_PORT
+          value: {{ .Values.backend.port | quote }}
+        ports:
+        - containerPort: {{ .Values.frontend.port }}

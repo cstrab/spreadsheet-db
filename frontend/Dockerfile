@@ -1,4 +1,4 @@
-FROM node:19.2 AS build
+FROM node:18.16.0 AS build
 
 ARG REACT_APP_API_HOST
 ARG REACT_APP_API_PORT
@@ -19,7 +19,7 @@ RUN REACT_APP_API_HOST=${REACT_APP_API_HOST} \
     REACT_APP_NGINX_PORT=${REACT_APP_NGINX_PORT} \
     npm run build
 
-FROM nginx:alpine
+FROM nginx:1.21.6-alpine
 COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

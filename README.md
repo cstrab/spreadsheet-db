@@ -297,9 +297,9 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 - [x] Local Testing:
 - [x] CI/CD: 
     - [x] General - Unit tests for Frontend and Backend in CI pipeline 
-    - [x] General - Automated docker image build and push to Dockerhub in CI pipeline
-- [ ] Deployment:
-    - [ ] General - Helm chart for Kubernetes deployment
+    - [x] General - Automated docker image build and push to GitHub registry in CI pipeline
+- [x] Deployment:
+    - [x] General - Helm chart, values, and templates for Kubernetes deployment
 - [ ] General:
     - [ ] General - Update README.md with deployment instructions
 
@@ -315,7 +315,6 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] General - Refactor for identity column changes in database
     - [ ] useGrid.ts - Change alert statements to Material UI modals 
-    - [ ] General - Cleanup dependencies
 - [ ] Backend:
     - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table (Benefits: abstraction, centralization, code reusability, and decoupling)
     - [ ] main.py - Update cors middleware for production environment to address security concerns
