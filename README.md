@@ -297,7 +297,7 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
 - [x] Local Testing:
 - [x] CI/CD: 
     - [x] General - Unit tests for Frontend and Backend in CI pipeline 
-    - [ ] General - Automated docker image build and push to Dockerhub in CI pipeline
+    - [x] General - Automated docker image build and push to Dockerhub in CI pipeline
 - [ ] Deployment:
     - [ ] General - Helm chart for Kubernetes deployment
 - [ ] General:
