@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit_tests_cov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run docker compose
+        run: |
+          export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+          export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+          export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          export FASTAPI_PORT=${{ secrets.FASTAPI_PORT }}
+          export REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }}
+          export REACT_APP_API_PORT=${{ secrets.REACT_APP_API_PORT }}
+          export REACT_APP_PORT=${{ secrets.REACT_APP_PORT }}
+          export REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
+          docker compose up -d
+
+      - name: Install packages in backend container
+        run: |
+          docker exec spreadsheet-db-backend-1 pip install pytest-cov
+
+      - name: Run backend tests with direct lcov coverage report
+        run: |
+          docker exec spreadsheet-db-backend-1 pytest --cov=. --cov-report=lcov:coverage-backend.info
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.16.0' 
+
+      - name: Install dependencies
+        run: | 
+          cd frontend 
+          npm ci --legacy-peer-deps
+
+      - name: Run frontend tests with coverage
+        run: | 
+          cd frontend 
+          npm test -- --coverage
+
+      - name: Generate frontend coverage report
+        run: | 
+          cd frontend 
+          npx lcov-result-merger 'coverage/**/*.info' > coverage-frontend.info
+
+      - name: Adjust paths in backend coverage report
+        run: |
+          sed -i 's/^SF:/SF:backend\//g' ./backend/coverage-backend.info
+
+      - name: Adjust paths in frontend coverage report
+        run: |
+          sed -i 's/^SF:/SF:frontend\//g' ./frontend/coverage-frontend.info
+
+      - name: Upload backend coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: ./backend/coverage-backend.info
+
+      - name: Upload frontend coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: ./frontend/coverage-frontend.info
+
+  docker_build_push_amd64:
+    needs: unit_tests_cov
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.PAT }}
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/frontend:latest-amd64
+          platforms: linux/amd64
+          build-args: |
+            REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }}
+            REACT_APP_PORT=${{ secrets.REACT_APP_PORT }}
+            REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
+      - name: Build and push backend Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/backend:latest-amd64
+          platforms: linux/amd64
+
+  docker_build_push_arm64:
+    needs: unit_tests_cov
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.PAT }}
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/frontend:latest-arm64
+          platforms: linux/arm64/v8
+          build-args: |
+            REACT_APP_API_HOST=${{ secrets.REACT_APP_API_HOST }}
+            REACT_APP_PORT=${{ secrets.REACT_APP_PORT }}
+            REACT_APP_NGINX_PORT=${{ secrets.REACT_APP_NGINX_PORT }}
+      - name: Build and push backend Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/backend:latest-arm64
+          platforms: linux/arm64/v8

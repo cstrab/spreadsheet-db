@@ -1,0 +1,14 @@
+database:
+  name: database
+  image: bitnami/postgresql:latest
+  port: 5432
+  pvcName: postgres-pvc
+  storageSize: 1Gi
+backend:
+  name: backend
+  image: ghcr.io/cstrab/spreadsheet-db/backend:latest-amd64
+  port: 8000
+frontend:
+  name: frontend
+  image: ghcr.io/cstrab/spreadsheet-db/frontend:latest-amd64
+  port: 80

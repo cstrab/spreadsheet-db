@@ -5,7 +5,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-    
+[![Coverage Status][coverage-shield]][coverage-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -69,9 +69,9 @@ spreadsheet-db allows users to manage relational databases through an excel-like
 
 ### Built With
 
-* [![React][React.js]][React-url]
-* [![Python][Python]][Python-url]
-* [![Postgres][Postgres]][Postgres-url]
+* [![React][react.js]][react-url]
+* [![Python][python]][python-url]
+* [![Postgres][postgres]][postgres-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -101,20 +101,16 @@ The following sections cover installation instructions using Docker Compose
    ```sh
    git clone https://github.com/cstrab/spreadsheet-db.git
    ```
-2. Create .env file 
-   ```sh
-   cp .env.sample .env
-   ```
-3. Build and start project
+2. Build and start project
    ```sh
    docker compose up -d
    ``` 
-4. Navigate to [localhost:3000](http://localhost:3000)
+3. Navigate to [localhost:3000](http://localhost:3000)
 * Note: Sample data is provided in the spreadsheet-db/setup/data folder for testing file upload
 
 #### Using User Defined Tables (Templating for new project)
 
-1. Repeat steps 1. and 2. above
+1. Repeat step 1. above
 2. Update spreadsheet/setup/schema.json file with desired 'schema_name" and 'tables':
 * Restrictions: 
     - Only supports a single schema
@@ -292,18 +288,18 @@ Goal: Initial release
 Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Breaking changes are not expected during this phase, but bugs will recorded to resolve. Unit test coverage is required (80%) for Frontend and Backend.
 
 
-- [ ] Frontend:
-    - [ ] General - Unit tests
-- [ ] Backend:
-    - [ ] General - Unit tests 
-- [ ] Database:
-- [ ] Setup:
-- [ ] Local Testing:
-- [ ] CI/CD: 
-    - [ ] General - Automated docker image build and push to Dockerhub in CI pipeline
-    - [ ] General - Unit tests for Frontend and Backend in CI pipeline
-- [ ] Deployment:
-    - [ ] General - Helm chart for Kubernetes deployment
+- [x] Frontend:
+    - [x] General - Unit tests
+- [x] Backend:
+    - [x] General - Unit tests 
+- [x] Database:
+- [x] Setup:
+- [x] Local Testing:
+- [x] CI/CD: 
+    - [x] General - Unit tests for Frontend and Backend in CI pipeline 
+    - [x] General - Automated docker image build and push to GitHub registry in CI pipeline
+- [x] Deployment:
+    - [x] General - Helm chart, values, and templates for Kubernetes deployment
 - [ ] General:
     - [ ] General - Update README.md with deployment instructions
 
@@ -319,9 +315,8 @@ Stage: Version 1.0 - The app with be considered Version 1.0 after this phase. Br
     - [ ] apiInterfaces.ts - Update interfaces from 'any' to possible schemas for each table
     - [ ] General - Refactor for identity column changes in database
     - [ ] useGrid.ts - Change alert statements to Material UI modals 
-    - [ ] General - Cleanup dependencies
 - [ ] Backend:
-    - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table 
+    - [ ] dao.py - Implement custom DAO (Data Access Object) for each data table (Benefits: abstraction, centralization, code reusability, and decoupling)
     - [ ] main.py - Update cors middleware for production environment to address security concerns
     - [ ] main.py - Create schema for response of each endpoint (i.e. /read and /update since they return data)
     - [ ] General - Refactor for identity column changes in database
@@ -403,9 +398,11 @@ Your Name - Curt Strab - cstrab@outlook.com
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/cstrab/
 [product-screenshot]: images/screenshot.png
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
-[Python-url]: https://python.org/
-[Postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
-[Postgres-url]: https://www.postgresql.org/
+[react.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[react-url]: https://reactjs.org/
+[python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[python-url]: https://python.org/
+[postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
+[postgres-url]: https://www.postgresql.org/
+[coverage-shield]: https://img.shields.io/coveralls/github/cstrab/spreadsheet-db.svg?style=for-the-badge
+[coverage-url]: https://coveralls.io/github/cstrab/spreadsheet-db?branch=main

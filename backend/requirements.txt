@@ -1,7 +1,7 @@
-fastapi
-uvicorn
-sqlalchemy
-pyodbc
-pymssql
-psycopg2
-pydantic
+fastapi==0.111.0
+uvicorn==0.29.0
+sqlalchemy==2.0.30
+pyodbc==5.1.0
+pymssql==2.3.0
+psycopg2==2.9.9
+pydantic==2.7.1
